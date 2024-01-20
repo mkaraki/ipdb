@@ -7,4 +7,14 @@ const rewriteEpoch = () => {
 
 const nanoToSeconds = (nano) => Math.floor(nano / 1000000000);
 
-rewriteEpoch();
+if (typeof module !== 'undefined') {
+    module.exports = {
+        nanoToSeconds,
+    };
+}
+
+if (typeof document !== 'undefined') {
+    document.onload = () => {
+        rewriteEpoch();
+    };
+}

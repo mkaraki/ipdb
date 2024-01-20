@@ -1,0 +1,9 @@
+{
+  "name": "ipdb-test-client-qunit",
+  "scripts": {
+    "test": "qunit"
+  },
+  "devDependencies": {
+    "qunit": "^2.20.0"
+  }
+}

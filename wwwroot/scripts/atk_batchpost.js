@@ -1,3 +1,15 @@
+const global_nanoToSeconds = (nano) => {
+    if (typeof document !== 'undefined') {
+        // Browser
+        return nanoToSeconds(nano);
+    }
+    else {
+        // Not browser
+        const { nanoToSeconds } = require('./global.js');
+        return nanoToSeconds(nano);
+    }
+}
+
 const parseFgtIpsLog = (log) => {
     const lines = log.replace("\r\n", "\n").split("\n");
     let ipsLog = [];
@@ -13,6 +25,7 @@ const parseFgtIpsLog = (log) => {
         const dst = line.match(/dstip=([0-9\.:]+)/)[1];
         const dstport = line.match(/dstport=([0-9]+)/)[1];
         const msg = line.match(/attack="([^"]+)"/)[1];
+        const time = global_nanoToSeconds(eventtime);
 
         ipsLog.push({
             src: src,
@@ -20,8 +33,14 @@ const parseFgtIpsLog = (log) => {
             dst: dst,
             dstPort: dstport,
             msg: 'FortiGate IPS Signature: ' + msg,
-            epoch: nanoToSeconds(eventtime),
+            epoch: time,
         });
     });
     return ipsLog;
 };
+
+if (typeof module !== 'undefined') {
+    module.exports = {
+        parseFgtIpsLog,
+    };
+}
