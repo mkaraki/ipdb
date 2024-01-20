@@ -1,0 +1,22 @@
+version: "3.7"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./wwwroot:/var/www/html:ro
+      - ./_config.php:/var/www/_config.php:ro
+    ports:
+      - 3380:80
+
+  postgres:
+    image: postgres:11.1-alpine
+    environment:
+      POSTGRES_USER: ipdb
+      POSTGRES_PASSWORD: ipdb
+      POSTGRES_DB: ipdb
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+      - ./dbinit:/docker-entrypoint-initdb.d:ro
