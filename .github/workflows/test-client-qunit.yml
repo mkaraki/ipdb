@@ -1,0 +1,25 @@
+name: Tests - Client - QUnit
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: tests/client-qunit
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: pnpm/action-setup@v2
+      with:
+        version: latest
+        run_install: false
+    - run: pnpm install --dev
+    - run: pnpm test
