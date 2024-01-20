@@ -5,9 +5,6 @@ $db = createDbLink();
 $range = $_GET['range'] ?? 'host';
 if ($range !== 'net') $range = 'host';
 
-$atk_list4 = null;
-$atk_list6 = null;
-
 if ($range === 'net') {
     $atk_list4 = pg_query($db, 'SELECT DISTINCT network(set_masklen(ip, 24)) AS ip FROM atkIps WHERE family(ip) = 4 ORDER BY ip ASC');
     $atk_list6 = pg_query($db, 'SELECT DISTINCT network(set_masklen(ip, 64)) AS ip FROM atkIps WHERE family(ip) = 6 ORDER BY ip ASC');
