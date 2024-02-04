@@ -47,7 +47,7 @@ $atk_list = pg_query($db, 'SELECT ip, rdns,
                         <?php endif; ?>
                     </td>
                     <td class="unixepoch" data-epoch="<?= $rows['addedat'] ?>"><?= date('Y-m-d H:i:s a', $rows['addedat']) ?></td>
-                    <td class="unixepoch" data-epoch="<?= $rows['lastseen'] ?>"><?= date('Y-m-d H:i:s a', $rows['addedat']) ?></td>
+                    <td class="unixepoch" data-epoch="<?= $rows['lastseen'] ?>"><?= date('Y-m-d H:i:s a', $rows['lastseen']) ?></td>
                 </tr>
             <?php endfor; ?>
         </tbody>
