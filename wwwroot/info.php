@@ -19,7 +19,7 @@ $isPrivate = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE) === 
 if (!$isPrivate) {
 
     $link = createDbLink();
-    $atkDb = pg_query($link, "SELECT ip, rdns, extract(epoch from addedat) as addedat, extract(epoch from lastseen) as lastseen FROM atkIps WHERE ip = '$ip'");
+    $atkDb = pg_query($link, "SELECT ip, extract(epoch from addedat) as addedat, extract(epoch from lastseen) as lastseen FROM atkIps WHERE ip = '$ip'");
     $inAtkDb = pg_num_rows($atkDb) > 0;
     if ($inAtkDb) {
         $atkDbData = pg_fetch_array($atkDb, NULL, PGSQL_ASSOC);

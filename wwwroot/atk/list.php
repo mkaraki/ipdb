@@ -5,12 +5,15 @@ $p = intval($_GET['p'] ?? 1);
 $offset = ($p - 1) * 100;
 
 $db = createDbLink();
-$atk_list = pg_query($db, 'SELECT ip, rdns,
-                                extract(epoch from addedat) as addedat,
-                                extract(epoch from lastseen) as lastseen
-                           FROM atkIps
-                           ORDER BY lastseen DESC
-                           LIMIT 100 OFFSET ' . $offset);
+$atk_list = pg_query($db, 'SELECT a.ip, meta_rdns.rdns as rdns,
+                                extract(epoch from a.addedat) as addedat,
+                                extract(epoch from a.lastseen) as lastseen
+                            FROM
+                                atkIps a
+                            LEFT JOIN meta_rdns ON a.ip = meta_rdns.ip
+                            ORDER BY lastseen DESC
+                            LIMIT 100 OFFSET ' . $offset);
+$atkIpCnt = pg_fetch_result(pg_query($db, 'SELECT COUNT(*) FROM atkIps'), 0, 0);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -54,7 +57,7 @@ $atk_list = pg_query($db, 'SELECT ip, rdns,
     </table>
     <div>
         <div>
-            Page <?= $p ?> (<?= pg_num_rows($atk_list) ?> rows)
+            Page <?= $p ?> (<?= pg_num_rows($atk_list) ?> rows in page, <?= $atkIpCnt ?> rows in DB)
         </div>
         <div>
             <?php if ($p > 1) : ?>

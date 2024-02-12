@@ -55,11 +55,11 @@ if (pg_num_rows($atk_list) > 0) {
 }
 
 $rdns = gethostbyaddr($_POST['ip']);
-if ($rdns === false || $rdns === $ip) {
-    pg_query($db, "INSERT INTO atkIps (ip, addedat, lastseen) VALUES ('$ip', to_timestamp($rpt_time), to_timestamp($rpt_time))");
-} else {
-    pg_query($db, "INSERT INTO atkIps (ip, rdns, addedat, lastseen) VALUES ('$ip', '$rdns', to_timestamp($rpt_time), to_timestamp($rpt_time))");
+if ($rdns !== false && $rdns !== $ip && filter_var($rdns, FILTER_VALIDATE_DOMAIN)) {
+    pg_query($db, "INSERT INTO meta_rdns (ip, rdns, last_checked) VALUES ('$ip', '$rdns', NOW()::timestamp)");
 }
+
+pg_query($db, "INSERT INTO atkIps (ip, addedat, lastseen) VALUES ('$ip', to_timestamp($rpt_time), to_timestamp($rpt_time))");
 
 closeDbLink($db);
 
