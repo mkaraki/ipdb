@@ -34,5 +34,8 @@ function authBasic($userList, $ret = 'plain')
 
 function strDate($unixtime): string
 {
-    return date('Y-m-d H:i:s a', $unixtime);
+    if (!is_numeric($unixtime)) {
+        return '';
+    }
+    return date('Y-m-d H:i:s a', intval($unixtime));
 }

@@ -17,14 +17,21 @@ $isPrivate = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE) === 
 //$ipFamily = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? 'ipv6' : 'ipv4';
 
 if (!$isPrivate) {
-
     $link = createDbLink();
+
     $atkDb = pg_query($link, "SELECT ip, extract(epoch from addedat) as addedat, extract(epoch from lastseen) as lastseen FROM atkIps WHERE ip = '$ip'");
     $inAtkDb = pg_num_rows($atkDb) > 0;
     if ($inAtkDb) {
         $atkDbData = pg_fetch_array($atkDb, NULL, PGSQL_ASSOC);
     }
+    
+    $query_rdns = pg_query($link, "SELECT rdns, extract(epoch from last_checked) as last_checked FROM meta_rdns WHERE ip = '$ip' ORDER BY last_checked DESC LIMIT 1");
+    $has_meta_rdns = pg_num_rows($query_rdns) > 0;
+    $meta_rdns_data = pg_fetch_array($query_rdns, NULL, PGSQL_ASSOC);
+
+    closeDbLink($link);
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -41,6 +48,22 @@ if (!$isPrivate) {
         <p>IP address <code><?= $ip ?></code> is private or blocked address.</p>
     <?php elseif ($inAtkDb) : ?>
         <p>IP address <code><?= $ip ?></code> found in following databases.</p>
+
+        <?php if ($has_meta_rdns) : ?>
+            <h2>rDNS Cache</h2>
+            <table>
+                <tbody>
+                    <tr>
+                        <th scope="row">rDNS</th>
+                        <td><?= $meta_rdns_data['rdns'] ?></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Last checked</th>
+                        <td class="unixepoch" data-epoch="<?= $meta_rdns_data['last_checked'] ?>"><?= strDate($meta_rdns_data['last_checked']) ?></td>
+                    </tr>
+                </tbody>
+            </table>
+        <?php endif; ?>
 
         <?php if ($inAtkDb) : ?>
             <h2>ATKdb</h2>
