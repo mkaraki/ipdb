@@ -47,6 +47,8 @@ if (pg_num_rows($atk_list) > 0) {
     } else {
         pg_query($db, "UPDATE atkIps SET lastseen = to_timestamp($rpt_time) WHERE ip = '$ip'");
 
+        updateReverseDnsInfo($db, $ip);
+
         if (!$noredirect)
             header('Location: /atk/list.php?pj_status=0&pj_msg=Updated+database');
 
@@ -54,10 +56,7 @@ if (pg_num_rows($atk_list) > 0) {
     }
 }
 
-$rdns = gethostbyaddr($_POST['ip']);
-if ($rdns !== false && $rdns !== $ip && filter_var($rdns, FILTER_VALIDATE_DOMAIN)) {
-    pg_query($db, "INSERT INTO meta_rdns (ip, rdns, last_checked) VALUES ('$ip', '$rdns', NOW()::timestamp)");
-}
+updateReverseDnsInfo($db, $ip);
 
 pg_query($db, "INSERT INTO atkIps (ip, addedat, lastseen) VALUES ('$ip', to_timestamp($rpt_time), to_timestamp($rpt_time))");
 

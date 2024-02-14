@@ -25,9 +25,7 @@ if (!$isPrivate) {
         $atkDbData = pg_fetch_array($atkDb, NULL, PGSQL_ASSOC);
     }
     
-    $query_rdns = pg_query($link, "SELECT rdns, extract(epoch from last_checked) as last_checked FROM meta_rdns WHERE ip = '$ip' ORDER BY last_checked DESC LIMIT 1");
-    $has_meta_rdns = pg_num_rows($query_rdns) > 0;
-    $meta_rdns_data = pg_fetch_array($query_rdns, NULL, PGSQL_ASSOC);
+    $meta_rdns_data = getReverseDnsInfo($link, $ip);
 
     closeDbLink($link);
 }
@@ -49,13 +47,13 @@ if (!$isPrivate) {
     <?php elseif ($inAtkDb) : ?>
         <p>IP address <code><?= $ip ?></code> found in following databases.</p>
 
-        <?php if ($has_meta_rdns) : ?>
+        <?php if ($meta_rdns_data !== null) : ?>
             <h2>rDNS Cache</h2>
             <table>
                 <tbody>
                     <tr>
                         <th scope="row">rDNS</th>
-                        <td><?= $meta_rdns_data['rdns'] ?></td>
+                        <td><?= $meta_rdns_data['rdns'] ?? '<i>No PTR or invalid record</i>' ?></td>
                     </tr>
                     <tr>
                         <th scope="row">Last checked</th>
