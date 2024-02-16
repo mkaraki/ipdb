@@ -69,6 +69,7 @@ $atkIpCnt = pg_fetch_result(pg_query($db, 'SELECT COUNT(*) FROM atkIps'), 0, 0);
         </div>
     </div>
     <script src="../scripts/global.js"></script>
+    <script>rewriteEpoch();</script>
 </body>
 
 </html>
