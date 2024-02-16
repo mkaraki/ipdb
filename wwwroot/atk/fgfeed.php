@@ -3,7 +3,7 @@ require_once __DIR__ . '/../_init.php';
 $db = createDbLink();
 
 $range = $_GET['range'] ?? 'host';
-if ($range !== 'net') $range = 'host';
+if ($range !== 'smart' && $range !== 'net') $range = 'host';
 
 if (isset($_GET['family']))
 {
@@ -36,11 +36,16 @@ else
     $families = ['ipv4', 'ipv6'];
 }
 
-if ($range === 'net') {
+if ($range === 'smart') {
     if (in_array('ipv4', $families))
-        $atk_list4 = pg_query($db, 'SELECT DISTINCT network(set_masklen(ip, 24)) AS ip FROM atkIps WHERE family(ip) = 4 ORDER BY ip ASC');
+        $atk_list4 = pg_query($db, 'SELECT CASE WHEN COUNT(*) >= 2 THEN network(set_masklen(ip, 24)) ELSE MIN(ip) END AS ip FROM atkIps WHERE family(ip) = 4 GROUP BY network(set_masklen(ip, 24)) ORDER BY ip ASC');
     if (in_array('ipv6', $families))
-        $atk_list6 = pg_query($db, 'SELECT DISTINCT network(set_masklen(ip, 64)) AS ip FROM atkIps WHERE family(ip) = 6 ORDER BY ip ASC');
+        $atk_list6 = pg_query($db, 'SELECT CASE WHEN COUNT(*) >= 2 THEN network(set_masklen(ip, 64)) ELSE MIN(ip) END AS ip FROM atkIps WHERE family(ip) = 6 GROUP BY network(set_masklen(ip, 64)) ORDER BY ip ASC');
+} else if ($range === 'net') {
+    if (in_array('ipv4', $families))
+        $atk_list4 = pg_query($db, 'SELECT DISTINCT network(set_masklen(ip, 24)) as ip FROM atkIps WHERE family(ip) = 4 ORDER BY ip ASC');
+    if (in_array('ipv6', $families))
+        $atk_list6 = pg_query($db, 'SELECT DISTINCT network(set_masklen(ip, 64)) as ip FROM atkIps WHERE family(ip) = 6  ORDER BY ip ASC');
 } else {
     if (in_array('ipv4', $families))
         $atk_list4 = pg_query($db, 'SELECT ip FROM atkIps WHERE family(ip) = 4 ORDER BY ip ASC');
