@@ -49,8 +49,12 @@ $atkIpCnt = pg_fetch_result(pg_query($db, 'SELECT COUNT(*) FROM atkIps'), 0, 0);
                             (<?= $rows['rdns'] ?>)
                         <?php endif; ?>
                     </td>
-                    <td class="unixepoch" data-epoch="<?= $rows['addedat'] ?>"><?= date('Y-m-d H:i:s a', $rows['addedat']) ?></td>
-                    <td class="unixepoch" data-epoch="<?= $rows['lastseen'] ?>"><?= date('Y-m-d H:i:s a', $rows['lastseen']) ?></td>
+                    <?php if ($rows['addedat'] === $rows['lastseen']) : ?>
+                        <td colspan="2" class="unixepoch" data-epoch="<?= $rows['addedat'] ?>"><?= date('Y-m-d H:i:s a', $rows['addedat']) ?></td>
+                    <?php else : ?>
+                        <td class="unixepoch" data-epoch="<?= $rows['addedat'] ?>"><?= date('Y-m-d H:i:s a', $rows['addedat']) ?></td>
+                        <td class="unixepoch" data-epoch="<?= $rows['lastseen'] ?>"><?= date('Y-m-d H:i:s a', $rows['lastseen']) ?></td>
+                    <?php endif; ?>
                 </tr>
             <?php endfor; ?>
         </tbody>
