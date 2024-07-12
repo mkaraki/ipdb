@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../_config.php';
 require_once __DIR__ . '/../vendor/autoload.php';
+use GeoIp2\Database\Reader;
 
 function createDbLink()
 {
@@ -97,8 +98,8 @@ function prepareIpGeoReader() {
     // This method is now returns GeoIp2\Database\Reader objects
     // This may change in the future
 
-    $cityDb = new \MaxMind\Db\Reader(GEOIP_PARENT . '/GeoLite2-City.mmdb');
-    $asnDb = new \MaxMind\Db\Reader(GEOIP_PARENT . '/GeoLite2-ASN.mmdb');
+    $cityDb = new Reader(GEOIP_PARENT . '/GeoLite2-City.mmdb');
+    $asnDb = new Reader(GEOIP_PARENT . '/GeoLite2-ASN.mmdb');
 
     return [
         'cityDb' => $cityDb,
@@ -108,8 +109,21 @@ function prepareIpGeoReader() {
 
 
 function getIpGeoData($reader, $ip) {
-    $cityRecord = $reader['cityDb']->get($ip);
-    $asnRecord = $reader['asnDb']->get($ip);
+    try
+    {
+        $cityRecord = $reader['cityDb']->city($ip);
+        $asnRecord = $reader['asnDb']->asn($ip);
+    }
+    catch (Exception $e)
+    {
+        return [
+            'countryCode' => null,
+            'countryName' => null,
+            'cityName' => null,
+            'asn' => null,
+            'asName' => null,
+        ];
+    }
 
     $countryCode = $cityRecord->country->isoCode ?? null;
     $countryName = $cityRecord->country->name ?? null;

@@ -64,9 +64,23 @@ if ($dispIpGeoInfo) {
                         <?php
                             $geoInfo = getIpGeoData($geoReader, $rows['ip']);
                         ?>
-                        <td><?= htmlentities($geoInfo['countryName']) ?> (<?= htmlentities($geoInfo['countryCode']) ?>)</td>
-                        <td><?= htmlentities($city) ?></td>
-                        <td><?= htmlentities($geoInfo['asn']) ?> (<?= htmlentities($geoInfo['asName']) ?>)</td>
+                        <?php if ($geoInfo['countryName'] !== null && $geoInfo['countryCode'] !== null) : ?>
+                            <td><?= htmlentities($geoInfo['countryName']) ?> (<?= htmlentities($geoInfo['countryCode']) ?>)</td>
+                        <?php else : ?>
+                            <td>N/A</td>
+                        <?php endif; ?>
+                        <?php if ($geoInfo['cityName'] !== null) : ?>
+                            <td><?= htmlentities($geoInfo['cityName']) ?></td>
+                        <?php else : ?>
+                            <td>N/A</td>
+                        <?php endif; ?>
+                        <?php if ($geoInfo['asn'] !== null) : ?>
+                            <td>
+                                <?= htmlentities($geoInfo['asn']) ?>
+                                <?php if ($geoInfo['asName'] !== null): ?> (<?= htmlentities($geoInfo['asName']) ?>)<?php endif; ?></td>
+                        <?php else : ?>
+                            <td>N/A</td>
+                        <?php endif; ?>
                     <?php endif; ?>
                     <?php if ($rows['addedat'] === $rows['lastseen']) : ?>
                         <td colspan="2" class="unixepoch" data-epoch="<?= $rows['addedat'] ?>"><?= date('Y-m-d H:i:s a', $rows['addedat']) ?></td>
