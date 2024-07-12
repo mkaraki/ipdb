@@ -14,6 +14,11 @@ $atk_list = pg_query($db, 'SELECT a.ip, meta_rdns.rdns as rdns,
                             ORDER BY lastseen DESC
                             LIMIT 100 OFFSET ' . $offset);
 $atkIpCnt = pg_fetch_result(pg_query($db, 'SELECT COUNT(*) FROM atkIps'), 0, 0);
+
+$dispIpGeoInfo = isset($_GET['geo']) && $_GET['geo'] === '1';
+if ($dispIpGeoInfo) {
+    $geoReader = prepareIpGeoReader();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -22,6 +27,7 @@ $atkIpCnt = pg_fetch_result(pg_query($db, 'SELECT COUNT(*) FROM atkIps'), 0, 0);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Attack Detected IP List</title>
+    <link rel="stylesheet" href="../styles/main.css">
     <link rel="stylesheet" href="/styles/table.css">
 </head>
 
@@ -36,6 +42,11 @@ $atkIpCnt = pg_fetch_result(pg_query($db, 'SELECT COUNT(*) FROM atkIps'), 0, 0);
         <thead>
             <tr>
                 <th>IP (FQDN)</th>
+                <?php if ($dispIpGeoInfo) : ?>
+                    <th>Country</th>
+                    <th>City</th>
+                    <th>ASN</th>
+                <?php endif; ?>
                 <th>First report</th>
                 <th>Last report</th>
             </tr>
@@ -49,6 +60,14 @@ $atkIpCnt = pg_fetch_result(pg_query($db, 'SELECT COUNT(*) FROM atkIps'), 0, 0);
                             (<?= $rows['rdns'] ?>)
                         <?php endif; ?>
                     </td>
+                    <?php if ($dispIpGeoInfo) : ?>
+                        <?php
+                            $geoInfo = getIpGeoData($geoReader, $rows['ip']);
+                        ?>
+                        <td><?= htmlentities($geoInfo['countryName']) ?> (<?= htmlentities($geoInfo['countryCode']) ?>)</td>
+                        <td><?= htmlentities($city) ?></td>
+                        <td><?= htmlentities($geoInfo['asn']) ?> (<?= htmlentities($geoInfo['asName']) ?>)</td>
+                    <?php endif; ?>
                     <?php if ($rows['addedat'] === $rows['lastseen']) : ?>
                         <td colspan="2" class="unixepoch" data-epoch="<?= $rows['addedat'] ?>"><?= date('Y-m-d H:i:s a', $rows['addedat']) ?></td>
                     <?php else : ?>
@@ -72,6 +91,7 @@ $atkIpCnt = pg_fetch_result(pg_query($db, 'SELECT COUNT(*) FROM atkIps'), 0, 0);
             <?php endif; ?>
         </div>
     </div>
+    <?php require __DIR__ . '/../_legal.php'; ?>
     <script src="../scripts/global.js"></script>
     <script>rewriteEpoch();</script>
 </body>

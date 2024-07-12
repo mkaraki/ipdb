@@ -6,3 +6,4 @@ define('USER_ATK_REPORTER', [
 define('USER_ATK_MANAGER', [
     'admin' => 'INVALID HASH',
 ]);
+const GEOIP_PARENT = '/usr/local/GeoIP';

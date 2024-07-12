@@ -9,6 +9,7 @@ $atkIpCnt = pg_fetch_result(pg_query($link, 'SELECT COUNT(*) FROM atkIps'), 0, 0
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../styles/main.css">
     <title>IPdb ATK Database</title>
 </head>
 
@@ -17,6 +18,7 @@ $atkIpCnt = pg_fetch_result(pg_query($link, 'SELECT COUNT(*) FROM atkIps'), 0, 0
         <h1>IPdb ATK Database</h1>
         <p><?= $atkIpCnt ?> IPs in list. <a href="list.php">See full list</a></p>
     </header>
+    <?php require __DIR__ . '/../_legal.php'; ?>
 </body>
 
 </html>

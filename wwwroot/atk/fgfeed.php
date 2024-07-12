@@ -57,6 +57,9 @@ if ($range === 'smart') {
 header('Content-Type: text/plain; charset=utf-8');
 
 print("# Attack detected IPs ($range, infinite)");
+print('#');
+print('# This product includes GeoLite2 data created by MaxMind, available from https://www.maxmind.com');
+print('#');
 
 if (in_array('ipv4', $families))
 {
