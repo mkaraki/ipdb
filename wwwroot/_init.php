@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . '/../_config.php';
+require_once __DIR__ . '/../vendor/autoload.php';
+use GeoIp2\Database\Reader;
 
 function createDbLink()
 {
@@ -91,3 +93,50 @@ function updateReverseDnsInfo($link, $ip) {
         }
     }
 };
+
+function prepareIpGeoReader() {
+    // This method is now returns GeoIp2\Database\Reader objects
+    // This may change in the future
+
+    $cityDb = new Reader(GEOIP_PARENT . '/GeoLite2-City.mmdb');
+    $asnDb = new Reader(GEOIP_PARENT . '/GeoLite2-ASN.mmdb');
+
+    return [
+        'cityDb' => $cityDb,
+        'asnDb' => $asnDb,
+    ];
+}
+
+
+function getIpGeoData($reader, $ip) {
+    try
+    {
+        $cityRecord = $reader['cityDb']->city($ip);
+        $asnRecord = $reader['asnDb']->asn($ip);
+    }
+    catch (Exception $e)
+    {
+        return [
+            'countryCode' => null,
+            'countryName' => null,
+            'cityName' => null,
+            'asn' => null,
+            'asName' => null,
+        ];
+    }
+
+    $countryCode = $cityRecord->country->isoCode ?? null;
+    $countryName = $cityRecord->country->name ?? null;
+    $cityName = $cityRecord->city->name ?? null;
+
+    $asn = $asnRecord->autonomousSystemNumber ?? null;
+    $asName = $asnRecord->autonomousSystemOrganization ?? null;
+
+    return [
+        'countryCode' => $countryCode,
+        'countryName' => $countryName,
+        'cityName' => $cityName,
+        'asn' => $asn,
+        'asName' => $asName,
+    ];
+}

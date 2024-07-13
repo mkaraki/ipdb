@@ -8,6 +8,7 @@ authBasic(USER_ATK_MANAGER);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../styles/main.css">
     <title>Unlist IP from ATK DB</title>
 </head>
 
@@ -22,6 +23,7 @@ authBasic(USER_ATK_MANAGER);
             <input type="submit" value="Post">
         </div>
     </form>
+    <?php require __DIR__ . '/../_legal.php'; ?>
 </body>
 
 </html>

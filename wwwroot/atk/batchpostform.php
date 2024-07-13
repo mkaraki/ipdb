@@ -8,6 +8,7 @@ authBasic(USER_ATK_MANAGER);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../styles/main.css">
     <link rel="stylesheet" href="../styles/table.css">
     <title>Batch Add ATK IP Info</title>
 </head>
@@ -46,6 +47,7 @@ authBasic(USER_ATK_MANAGER);
             <button type="button" onclick="batchPost(document.getElementById('batch-preview'), this)">Post</button>
         </div>
     </div>
+    <?php require __DIR__ . '/../_legal.php'; ?>
 
 
     <script src="../scripts/global.js"></script>
