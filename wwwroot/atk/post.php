@@ -1,6 +1,39 @@
 <?php
 require_once __DIR__ . '/../_init.php';
 
+function updateAtkIpGeoCountryCode($db, $reader, $ip) {
+    try {
+        $cityData = $reader['cityDb']->city($ip);
+    }
+    catch (Exception $e) {
+        pg_query($db, 'UPDATE atkIps SET ccode = NULL WHERE ip = $1', [$ip]);
+        return;
+    }
+
+    $countryCode = $cityData->country->isoCode ?? null;
+
+    pg_query_params($db, 'UPDATE atkIps SET ccode = $1 WHERE ip = $2', [$countryCode, $ip]);
+}
+
+function updateAtkIpGeoAsn($db, $reader, $ip) {
+    try {
+        $asnData = $reader['asnDb']->asn($ip);
+    }
+    catch (Exception $e) {
+        pg_query($db, 'UPDATE atkIps SET asn = NULL WHERE ip = $1', [$ip]);
+        return;
+    }
+
+    $asn = $asnData->autonomousSystemNumber ?? null;
+
+    pg_query_params($db, 'UPDATE atkIps SET asn = $1 WHERE ip = $2', [$asn,  $ip]);
+}
+
+function updateAtkIpGeoMetadata($db, $reader, $ip) {
+    updateAtkIpGeoCountryCode($db, $reader, $ip);
+    updateAtkIpGeoAsn($db, $reader, $ip);
+}
+
 $rpt_time = time();
 
 if (!isset($_POST['role_mgr'])) {
@@ -48,6 +81,8 @@ if (pg_num_rows($atk_list) > 0) {
         pg_query($db, "UPDATE atkIps SET lastseen = to_timestamp($rpt_time) WHERE ip = '$ip'");
 
         updateReverseDnsInfo($db, $ip);
+        $geoReader = prepareIpGeoReader();
+        updateAtkIpGeoMetadata($db, $geoReader, $ip);
 
         if (!$noredirect)
             header('Location: /atk/list.php?pj_status=0&pj_msg=Updated+database');
@@ -59,6 +94,9 @@ if (pg_num_rows($atk_list) > 0) {
 updateReverseDnsInfo($db, $ip);
 
 pg_query($db, "INSERT INTO atkIps (ip, addedat, lastseen) VALUES ('$ip', to_timestamp($rpt_time), to_timestamp($rpt_time))");
+
+$geoReader = prepareIpGeoReader();
+updateAtkIpGeoMetadata($db, $geoReader, $ip);
 
 closeDbLink($db);
 

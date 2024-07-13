@@ -65,7 +65,9 @@ if ($dispIpGeoInfo) {
                             $geoInfo = getIpGeoData($geoReader, $rows['ip']);
                         ?>
                         <?php if ($geoInfo['countryName'] !== null && $geoInfo['countryCode'] !== null) : ?>
-                            <td><?= htmlentities($geoInfo['countryName']) ?> (<?= htmlentities($geoInfo['countryCode']) ?>)</td>
+                            <td class="countrycode" data-ccode="<?= htmlentities($geoInfo['countryCode']) ?>">
+                                <?= htmlentities($geoInfo['countryName']) ?> (<?= htmlentities($geoInfo['countryCode']) ?>)
+                            </td>
                         <?php else : ?>
                             <td>N/A</td>
                         <?php endif; ?>
@@ -107,7 +109,10 @@ if ($dispIpGeoInfo) {
     </div>
     <?php require __DIR__ . '/../_legal.php'; ?>
     <script src="../scripts/global.js"></script>
-    <script>rewriteEpoch();</script>
+    <script>
+        rewriteEpoch();
+        rewriteCountryCode();
+    </script>
 </body>
 
 </html>
