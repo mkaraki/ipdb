@@ -61,7 +61,7 @@ print('#');
 print('# This product includes GeoLite2 data created by MaxMind, available from https://www.maxmind.com');
 print('#');
 
-if (in_array('ipv4', $families))
+if (in_array('ipv4', $families) && isset($atk_list4))
 {
     for ($i = 0; $i < pg_num_rows($atk_list4); $i++) {
         $rows = pg_fetch_array($atk_list4, NULL, PGSQL_ASSOC);
@@ -69,7 +69,7 @@ if (in_array('ipv4', $families))
     }
 }
 
-if (in_array('ipv6', $families))
+if (in_array('ipv6', $families) && isset($atk_list6))
 {
     for ($i = 0; $i < pg_num_rows($atk_list6); $i++) {
         $rows = pg_fetch_array($atk_list6, NULL, PGSQL_ASSOC);

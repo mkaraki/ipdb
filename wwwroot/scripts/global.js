@@ -6,7 +6,7 @@ const rewriteEpoch = () => {
 };
 
 const rewriteCountryCode = () => { 
-    const intlDisplayName = new Intl.DisplayNames([(navigator.language || navigator.userLanguage)], {type: 'region'});
+    const intlDisplayName = new Intl.DisplayNames([navigator.language], {type: 'region'});
     document.querySelectorAll('.countrycode').forEach((elem) => {
         try {
             const countryCode = elem.dataset.ccode;

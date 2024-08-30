@@ -79,7 +79,7 @@ if (!$isPrivate) {
                 </tbody>
             </table>
         <?php endif; ?>
-        <script src="../scripts/global.js"></script>
+        <script src="scripts/global.js"></script>
     <?php else : ?>
         <p>IP address <code><?= $ip ?></code> not found in our databases.</p>
     <?php endif; ?>

@@ -21,7 +21,7 @@ authBasic(USER_ATK_MANAGER);
     <form action="" onsubmit="return false">
         <h2>FortiGate IPS</h2>
         <div>
-            Logs:
+            <label for="fgt-ips-log">Logs:</label>
             <textarea id="fgt-ips-log" cols="30" rows="10"></textarea>
         </div>
         <div>
@@ -96,12 +96,12 @@ authBasic(USER_ATK_MANAGER);
             const rows = table.querySelectorAll('tr');
             const data = [];
 
-            rows.forEach(async (v) => {
+            for (const v of rows) {
                 data.push({
                     data: JSON.parse(v.dataset.logObj),
                     elem: v
                 });
-            });
+            }
 
             let reported = [];
 
@@ -144,7 +144,7 @@ authBasic(USER_ATK_MANAGER);
                         body: formData,
                     })
                     .then((fetchRes) => {
-                        if (fetchRes.status == 303 || fetchRes.status == 200) {
+                        if (fetchRes.status === 303 || fetchRes.status === 200) {
                             v.elem.remove();
                             reported.push(logData.src);
                             goNext();

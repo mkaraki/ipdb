@@ -1,5 +1,3 @@
-version: "3.7"
-
 services:
   app:
     build:
@@ -9,7 +7,7 @@ services:
       - ./wwwroot:/var/www/html:ro
       - ./_config.php:/var/www/_config.php:ro
     ports:
-      - 3380:80
+      - '3380:80'
 
   postgres:
     image: postgres:11.1-alpine

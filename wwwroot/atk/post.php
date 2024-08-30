@@ -1,12 +1,13 @@
 <?php
 require_once __DIR__ . '/../_init.php';
 
-function updateAtkIpGeoCountryCode($db, $reader, $ip) {
+function updateAtkIpGeoCountryCode($db, $reader, $ip): void
+{
     try {
         $cityData = $reader['cityDb']->city($ip);
     }
-    catch (Exception $e) {
-        pg_query($db, 'UPDATE atkIps SET ccode = NULL WHERE ip = $1', [$ip]);
+    catch (Exception) {
+        pg_query_params($db, 'UPDATE atkIps SET ccode = NULL WHERE ip = $1', [$ip]);
         return;
     }
 
@@ -15,12 +16,13 @@ function updateAtkIpGeoCountryCode($db, $reader, $ip) {
     pg_query_params($db, 'UPDATE atkIps SET ccode = $1 WHERE ip = $2', [$countryCode, $ip]);
 }
 
-function updateAtkIpGeoAsn($db, $reader, $ip) {
+function updateAtkIpGeoAsn($db, $reader, $ip): void
+{
     try {
         $asnData = $reader['asnDb']->asn($ip);
     }
-    catch (Exception $e) {
-        pg_query($db, 'UPDATE atkIps SET asn = NULL WHERE ip = $1', [$ip]);
+    catch (Exception) {
+        pg_query_params($db, 'UPDATE atkIps SET asn = NULL WHERE ip = $1', [$ip]);
         return;
     }
 
@@ -29,7 +31,8 @@ function updateAtkIpGeoAsn($db, $reader, $ip) {
     pg_query_params($db, 'UPDATE atkIps SET asn = $1 WHERE ip = $2', [$asn,  $ip]);
 }
 
-function updateAtkIpGeoMetadata($db, $reader, $ip) {
+function updateAtkIpGeoMetadata($db, $reader, $ip): void
+{
     updateAtkIpGeoCountryCode($db, $reader, $ip);
     updateAtkIpGeoAsn($db, $reader, $ip);
 }

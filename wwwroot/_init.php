@@ -15,12 +15,12 @@ function createDbLink()
     return $link;
 }
 
-function closeDbLink($link)
+function closeDbLink($link): void
 {
     pg_close($link);
 }
 
-function authBasic($userList, $ret = 'plain')
+function authBasic($userList): void
 {
     global $_SERVER;
     if (
@@ -56,7 +56,8 @@ function getReverseDnsInfo($link, $ip): array|null
 
 const TTL_REVERSE_DNS = 604_800; // 1 week
 
-function updateReverseDnsInfo($link, $ip) {
+function updateReverseDnsInfo($link, $ip): void
+{
     $db_rdns = getReverseDnsInfo($link, $ip);
 
     if ($db_rdns !== null && $db_rdns['last_checked'] > time() - TTL_REVERSE_DNS) {
@@ -92,14 +93,26 @@ function updateReverseDnsInfo($link, $ip) {
             pg_query($link, "UPDATE meta_rdns SET last_checked = NOW()::timestamp, rdns = NULL WHERE ip = '$ip'");
         }
     }
-};
+}
 
-function prepareIpGeoReader() {
+function prepareIpGeoReader(): array
+{
     // This method is now returns GeoIp2\Database\Reader objects
     // This may change in the future
 
-    $cityDb = new Reader(GEOIP_PARENT . '/GeoLite2-City.mmdb');
-    $asnDb = new Reader(GEOIP_PARENT . '/GeoLite2-ASN.mmdb');
+    try {
+        $cityDb = new Reader(GEOIP_PARENT . '/GeoLite2-City.mmdb');
+    }
+    catch (Exception) {
+        $cityDb = null;
+    }
+
+    try {
+        $asnDb = new Reader(GEOIP_PARENT . '/GeoLite2-ASN.mmdb');
+    }
+    catch (Exception) {
+        $asnDb = null;
+    }
 
     return [
         'cityDb' => $cityDb,
@@ -108,20 +121,16 @@ function prepareIpGeoReader() {
 }
 
 
-function getIpGeoData($reader, $ip) {
-    try
-    {
-        $cityRecord = $reader['cityDb']->city($ip);
-        $asnRecord = $reader['asnDb']->asn($ip);
+function getIPGeoDataCity($reader, $ip): array
+{
+    try {
+        $cityRecord = $reader->city($ip);
     }
-    catch (Exception $e)
-    {
+    catch (Exception) {
         return [
             'countryCode' => null,
             'countryName' => null,
             'cityName' => null,
-            'asn' => null,
-            'asName' => null,
         ];
     }
 
@@ -129,14 +138,56 @@ function getIpGeoData($reader, $ip) {
     $countryName = $cityRecord->country->name ?? null;
     $cityName = $cityRecord->city->name ?? null;
 
-    $asn = $asnRecord->autonomousSystemNumber ?? null;
-    $asName = $asnRecord->autonomousSystemOrganization ?? null;
-
     return [
         'countryCode' => $countryCode,
         'countryName' => $countryName,
         'cityName' => $cityName,
+    ];
+}
+
+function getIPGeoDataAsn($reader, $ip): array
+{
+    try {
+        $asnRecord = $reader->asn($ip);
+    }
+    catch (Exception) {
+        return [
+            'asn' => null,
+            'asName' => null,
+        ];
+    }
+
+    $asn = $asnRecord->autonomousSystemNumber ?? null;
+    $asName = $asnRecord->autonomousSystemOrganization ?? null;
+
+    return [
         'asn' => $asn,
         'asName' => $asName,
     ];
+}
+
+function getIpGeoData($reader, $ip): array
+{
+    $returnData = [
+        'countryCode' => null,
+        'countryName' => null,
+        'cityName' => null,
+        'asn' => null,
+        'asName' => null,
+    ];
+
+    if ($reader['cityDb'] !== null) {
+        $cityData = getIpGeoDataCity($reader['cityDb'], $ip);
+        $returnData['countryCode'] = $cityData['countryCode'];
+        $returnData['countryName'] = $cityData['countryName'];
+        $returnData['cityName'] = $cityData['cityName'];
+    }
+
+    if ($reader['asnDb'] !== null) {
+        $asnData = getIpGeoDataAsn($reader['asnDb'], $ip);
+        $returnData['asn'] = $asnData['asn'];
+        $returnData['asName'] = $asnData['asName'];
+    }
+
+    return $returnData;
 }

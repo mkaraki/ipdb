@@ -1,9 +1,9 @@
 <?php
 const DB_CONSTR = 'host=postgres port=5432 dbname=ipdb user=ipdb password=ipdb';
-define('USER_ATK_REPORTER', [
+const USER_ATK_REPORTER = [
     'example' => 'INVALID HASH',
-]);
-define('USER_ATK_MANAGER', [
+];
+const USER_ATK_MANAGER = [
     'admin' => 'INVALID HASH',
-]);
+];
 const GEOIP_PARENT = '/usr/local/GeoIP';
