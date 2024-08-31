@@ -38,15 +38,15 @@ if (!$isPrivate) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles/main.css">
-    <title><?= $ip ?> - IPdb Search</title>
+    <title><?= htmlentities($ip) ?> - IPdb Search</title>
 </head>
 
 <body>
     <h1>IPdb <small>search</small></h1>
     <?php if ($isPrivate) : ?>
-        <p>IP address <code><?= $ip ?></code> is private or blocked address.</p>
+        <p>IP address <code><?= htmlentities($ip) ?></code> is private or blocked address.</p>
     <?php elseif ($inAtkDb) : ?>
-        <p>IP address <code><?= $ip ?></code> found in following databases.</p>
+        <p>IP address <code><?= htmlentities($ip) ?></code> found in following databases.</p>
 
         <?php if ($meta_rdns_data !== null) : ?>
             <h2>rDNS Cache</h2>
@@ -54,7 +54,13 @@ if (!$isPrivate) {
                 <tbody>
                     <tr>
                         <th scope="row">rDNS</th>
-                        <td><?= $meta_rdns_data['rdns'] ?? '<i>No PTR or invalid record</i>' ?></td>
+                        <td>
+                            <?php if ($meta_rdns_data['rdns'] !== null) : ?>
+                                <?= htmlentities($meta_rdns_data['rdns']) ?>
+                            <?php else : ?>
+                                <i>No PTR or invalid record</i>
+                            <?php endif; ?>
+                        </td>
                     </tr>
                     <tr>
                         <th scope="row">Last checked</th>
@@ -81,7 +87,7 @@ if (!$isPrivate) {
         <?php endif; ?>
         <script src="scripts/global.js"></script>
     <?php else : ?>
-        <p>IP address <code><?= $ip ?></code> not found in our databases.</p>
+        <p>IP address <code><?= htmlentities($ip) ?></code> not found in our databases.</p>
     <?php endif; ?>
     <?php require __DIR__ . '/_legal.php'; ?>
 </body>

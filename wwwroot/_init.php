@@ -68,29 +68,29 @@ function updateReverseDnsInfo($link, $ip): void
     if ($rdns !== false && $rdns !== $ip && filter_var($rdns, FILTER_VALIDATE_DOMAIN)) {
         if ($db_rdns === null) {
             // Insert new record if DB doesn't have it
-            pg_query($link, "INSERT INTO meta_rdns (ip, rdns, last_checked) VALUES ('$ip', '$rdns', NOW()::timestamp)");
+            pg_query_params($link, 'INSERT INTO meta_rdns (ip, rdns, last_checked) VALUES ($1, $2, NOW()::timestamp)', [$ip, $rdns]);
         }
         else if ($db_rdns['rdns'] !== $rdns)
         {
             // Update record if DB has it and it's different
-            pg_query($link, "UPDATE meta_rdns SET last_checked = NOW()::timestamp, rdns = '$rdns' WHERE ip = '$ip'");
+            pg_query_params($link, 'UPDATE meta_rdns SET last_checked = NOW()::timestamp, rdns = $1 WHERE ip = $2', [$rdns, $ip]);
         }
         else
         {
             // Update last checked time if DB has it and it's same
-            pg_query($link, "UPDATE meta_rdns SET last_checked = NOW()::timestamp WHERE ip = '$ip'");
+            pg_query_params($link, 'UPDATE meta_rdns SET last_checked = NOW()::timestamp WHERE ip = $1', [$ip]);
         }
     }
     else
     {
         if ($db_rdns === null) {
             // Insert new record if DB doesn't have it
-            pg_query($link, "INSERT INTO meta_rdns (ip, rdns, last_checked) VALUES ('$ip', NULL, NOW()::timestamp)");
+            pg_query_params($link, 'INSERT INTO meta_rdns (ip, rdns, last_checked) VALUES ($1, NULL, NOW()::timestamp)', [$ip]);
         }
         else
         {
             // Update last_checked and keep NULL rdns when DB has it
-            pg_query($link, "UPDATE meta_rdns SET last_checked = NOW()::timestamp, rdns = NULL WHERE ip = '$ip'");
+            pg_query_params($link, 'UPDATE meta_rdns SET last_checked = NOW()::timestamp, rdns = NULL WHERE ip = $1', [$ip]);
         }
     }
 }

@@ -5,14 +5,14 @@ $p = intval($_GET['p'] ?? 1);
 $offset = ($p - 1) * 100;
 
 $db = createDbLink();
-$atk_list = pg_query($db, 'SELECT a.ip, meta_rdns.rdns as rdns,
+$atk_list = pg_query_params($db, 'SELECT a.ip, meta_rdns.rdns as rdns,
                                 extract(epoch from a.addedat) as addedat,
                                 extract(epoch from a.lastseen) as lastseen
                             FROM
                                 atkIps a
                             LEFT JOIN meta_rdns ON a.ip = meta_rdns.ip
                             ORDER BY lastseen DESC
-                            LIMIT 100 OFFSET ' . $offset);
+                            LIMIT 100 OFFSET $1', [$offset]);
 $atkIpCnt = pg_fetch_result(pg_query($db, 'SELECT COUNT(*) FROM atkIps'), 0, 0);
 
 $dispIpGeoInfo = isset($_GET['geo']) && $_GET['geo'] === '1';

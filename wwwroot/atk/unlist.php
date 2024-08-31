@@ -12,7 +12,7 @@ if (!isset($_POST['ip']) || !filter_var($_POST['ip'], FILTER_VALIDATE_IP, FILTER
 
 $ip = $_POST['ip'];
 
-pg_query($db, "DELETE FROM atkIps WHERE ip = '$ip'");
+pg_query_params($db, 'DELETE FROM atkIps WHERE ip = $1', [$ip]);
 
 http_response_code(303);
 header('Location: /atk/list.php');

@@ -82,7 +82,7 @@ if (pg_num_rows($ignore_check) > 0) {
     die('No update (in ignore list)');
 }
 
-$atk_list = pg_query($db, "SELECT ip, extract(epoch from lastseen) as lastseen FROM atkIps WHERE ip = '$ip'");
+$atk_list = pg_query_params($db, 'SELECT ip, extract(epoch from lastseen) as lastseen FROM atkIps WHERE ip = $1', [$ip]);
 
 if (!$noredirect)
     http_response_code(303);
@@ -95,7 +95,7 @@ if (pg_num_rows($atk_list) > 0) {
 
         die('No update');
     } else {
-        pg_query($db, "UPDATE atkIps SET lastseen = to_timestamp($rpt_time) WHERE ip = '$ip'");
+        pg_query_params($db, 'UPDATE atkIps SET lastseen = to_timestamp($1) WHERE ip = $2', [$rpt_time, $ip]);
 
         updateReverseDnsInfo($db, $ip);
         $geoReader = prepareIpGeoReader();
@@ -110,7 +110,7 @@ if (pg_num_rows($atk_list) > 0) {
 
 updateReverseDnsInfo($db, $ip);
 
-pg_query($db, "INSERT INTO atkIps (ip, addedat, lastseen) VALUES ('$ip', to_timestamp($rpt_time), to_timestamp($rpt_time))");
+pg_query_params($db, 'INSERT INTO atkIps (ip, addedat, lastseen) VALUES ($1, to_timestamp($2), to_timestamp($2))', [$ip, $rpt_time]);
 
 $geoReader = prepareIpGeoReader();
 updateAtkIpGeoMetadata($db, $geoReader, $ip);
