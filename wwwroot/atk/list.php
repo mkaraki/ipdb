@@ -34,7 +34,7 @@ if ($dispIpGeoInfo) {
 <body>
     <?php if (isset($_GET['pj_status']) && is_numeric($_GET['pj_status']) && isset($_GET['pj_msg'])) : ?>
         <div>
-            Last operation ends with code <?= $_GET['pj_status'] ?>: <?= htmlentities($_GET['pj_msg']) ?>
+            Last operation ends with code <?= htmlentities($_GET['pj_status']) ?>: <?= htmlentities($_GET['pj_msg']) ?>
         </div>
     <?php endif; ?>
     <h1>Attack Detected IP List</h1>

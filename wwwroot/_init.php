@@ -44,7 +44,7 @@ function strDate($unixtime): string
 
 function getReverseDnsInfo($link, $ip): array|null
 {
-    $query_rdns = pg_query($link, "SELECT rdns, extract(epoch from last_checked) as last_checked FROM meta_rdns WHERE ip = '$ip' ORDER BY last_checked DESC LIMIT 1");
+    $query_rdns = pg_query_params($link, 'SELECT rdns, extract(epoch from last_checked) as last_checked FROM meta_rdns WHERE ip = $1 ORDER BY last_checked DESC LIMIT 1', [$ip]);
     $has_meta_rdns = pg_num_rows($query_rdns) > 0;
     $meta_rdns_data = pg_fetch_array($query_rdns, NULL, PGSQL_ASSOC);
 
