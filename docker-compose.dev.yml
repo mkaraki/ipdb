@@ -6,6 +6,7 @@ services:
     volumes:
       - ./wwwroot:/var/www/html:ro
       - ./_config.php:/var/www/_config.php:ro
+      - ./vendor:/var/www/vendor:ro
     ports:
       - '3380:80'
 

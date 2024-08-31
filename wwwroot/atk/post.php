@@ -1,42 +1,6 @@
 <?php
 require_once __DIR__ . '/../_init.php';
 
-function updateAtkIpGeoCountryCode($db, $reader, $ip): void
-{
-    try {
-        $cityData = $reader['cityDb']->city($ip);
-    }
-    catch (Exception) {
-        pg_query_params($db, 'UPDATE atkIps SET ccode = NULL WHERE ip = $1', [$ip]);
-        return;
-    }
-
-    $countryCode = $cityData->country->isoCode ?? null;
-
-    pg_query_params($db, 'UPDATE atkIps SET ccode = $1 WHERE ip = $2', [$countryCode, $ip]);
-}
-
-function updateAtkIpGeoAsn($db, $reader, $ip): void
-{
-    try {
-        $asnData = $reader['asnDb']->asn($ip);
-    }
-    catch (Exception) {
-        pg_query_params($db, 'UPDATE atkIps SET asn = NULL WHERE ip = $1', [$ip]);
-        return;
-    }
-
-    $asn = $asnData->autonomousSystemNumber ?? null;
-
-    pg_query_params($db, 'UPDATE atkIps SET asn = $1 WHERE ip = $2', [$asn,  $ip]);
-}
-
-function updateAtkIpGeoMetadata($db, $reader, $ip): void
-{
-    updateAtkIpGeoCountryCode($db, $reader, $ip);
-    updateAtkIpGeoAsn($db, $reader, $ip);
-}
-
 $rpt_time = time();
 
 if (!isset($_POST['role_mgr'])) {
@@ -57,16 +21,66 @@ if (!isset($_POST['role_mgr'])) {
     }
 }
 
-$noredirect = isset($_POST['noredirect']) && $_POST['noredirect'] === '1';
-
-$db = createDbLink();
-
 if (!isset($_POST['ip']) || !filter_var($_POST['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE)) {
     http_response_code(400);
     die('Bad request');
 }
 
+function updateAtkIpGeoCountryCode($db, $reader, $ip): void
+{
+    if (!isset($reader['cityDb']))
+        return;
+
+    try {
+        $cityData = $reader['cityDb']->city($ip);
+    }
+    catch (Exception) {
+        pg_query_params($db, 'UPDATE atkIps SET ccode = NULL WHERE ip = $1', [$ip]);
+        return;
+    }
+
+    $countryCode = $cityData->country->isoCode ?? null;
+
+    pg_query_params($db, 'UPDATE atkIps SET ccode = $1 WHERE ip = $2', [$countryCode, $ip]);
+}
+
+function updateAtkIpGeoAsn($db, $reader, $ip): void
+{
+    if (!isset($reader['asnDb']))
+        return;
+
+    try {
+        $asnData = $reader['asnDb']->asn($ip);
+    }
+    catch (Exception) {
+        pg_query_params($db, 'UPDATE atkIps SET asn = NULL WHERE ip = $1', [$ip]);
+        return;
+    }
+
+    $asn = $asnData->autonomousSystemNumber ?? null;
+
+    pg_query_params($db, 'UPDATE atkIps SET asn = $1 WHERE ip = $2', [$asn,  $ip]);
+}
+
+function updateAtkIpGeoMetadata($db, $reader, $ip): void
+{
+    updateAtkIpGeoCountryCode($db, $reader, $ip);
+    updateAtkIpGeoAsn($db, $reader, $ip);
+}
+
+$noredirect = isset($_POST['noredirect']) && $_POST['noredirect'] === '1';
+
+$db = createDbLink();
+
 $ip = $_POST['ip'];
+
+$ignore_check = pg_query_params($db, 'SELECT il.id FROM atkDbIgnoreList il WHERE ($1)::inet << il.net', [$ip]);
+if (pg_num_rows($ignore_check) > 0) {
+    if (!$noredirect)
+        header('Location: /atk/list.php?pj_status=0&pj_msg=No+update+(ignored)');
+
+    die('No update (in ignore list)');
+}
 
 $atk_list = pg_query($db, "SELECT ip, extract(epoch from lastseen) as lastseen FROM atkIps WHERE ip = '$ip'");
 
