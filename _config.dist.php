@@ -7,3 +7,6 @@ const USER_ATK_MANAGER = [
     'admin' => 'INVALID HASH',
 ];
 const GEOIP_PARENT = '/usr/local/GeoIP';
+const ATK_IGNORE_IP = [
+    '1.1.1.1'
+];
