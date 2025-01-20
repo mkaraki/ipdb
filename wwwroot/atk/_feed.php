@@ -66,7 +66,8 @@ if (in_array('ipv4', $families) && isset($atk_list4)) {
                 $ip4_list[$key] .= '/32';
             }
         }
-        $ip4_list = recursiveCombineAdjacentSubnets($ip4_list);
+        $ip4_long_list = getIpLongSubnetFromCidr($ip4_list);
+        $ip4_list = formatIpLongSubnetToCidr(recursiveCombineAdjacentSubnets($ip4_long_list));
     }
 }
 if (in_array('ipv6', $families) && isset($atk_list6)) {
