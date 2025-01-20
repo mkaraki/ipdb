@@ -56,20 +56,21 @@ if ($range === 'smart') {
 
 $ip4_list = [];
 $ip6_list = [];
+
 if (in_array('ipv4', $families) && isset($atk_list4)) {
-    $ip4_list = pg_fetch_all($atk_list4);
+    $ip4_list = pg_fetch_all_columns($atk_list4, 0);
     if (in_array($range, ['smart', 'net'])) {
         // If not cidr, add `/32` to each ip
         foreach ($ip4_list as $key => $ip) {
-            if (strpos($ip['ip'], '/') === false) {
-                $ip4_list[$key]['ip'] .= '/32';
+            if (!str_contains($ip, '/')) {
+                $ip4_list[$key] .= '/32';
             }
         }
         $ip4_list = recursiveCombineAdjacentSubnets($ip4_list);
     }
 }
 if (in_array('ipv6', $families) && isset($atk_list6)) {
-    $ip6_list = pg_fetch_all($atk_list6);
+    $ip6_list = pg_fetch_all_columns($atk_list6, 0);
 }
 
 closeDbLink($db);
