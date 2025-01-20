@@ -59,33 +59,31 @@ $ip6_list = [];
 
 if (in_array('ipv4', $families) && isset($atk_list4)) {
     $ip4_list = pg_fetch_all_columns($atk_list4, 0);
-    if (in_array($range, ['smart', 'net'])) {
+    if (
+        in_array($range, ['smart', 'net']) &&
+        defined('ATK_FEED_OPTIMIZE_LEVEL') &&
+        intval(ATK_FEED_OPTIMIZE_LEVEL) > 0
+    ) {
         // If not cidr, add `/32` to each ip
         foreach ($ip4_list as $key => $ip) {
             if (!str_contains($ip, '/')) {
                 $ip4_list[$key] .= '/32';
             }
         }
-        if (!defined('ATK_FEED_OPTIMIZE_LEVEL')) {
-            define('ATK_FEED_OPTIMIZE_LEVEL', 2);
-        } else {
-            switch (ATK_FEED_OPTIMIZE_LEVEL) {
-                case 1:
-                    $ip4_long_list = getIpLongSubnetFromCidr($ip4_list);
-                    $ip4_list = formatIpLongSubnetToCidr(combineAdjacentSubnets($ip4_long_list));
-                    break;
-                case 2:
-                    $ip4_long_list = getIpLongSubnetFromCidr($ip4_list);
-                    $ip4_list = formatIpLongSubnetToCidr(recursiveCombineAdjacentSubnets($ip4_long_list));
-                    break;
-                case 3:
-                    $ip4_long_list = getIpLongSubnetFromCidr($ip4_list);
-                    $ip4_list = formatIpLongSubnetToCidr(removeOverlappedSubnets(recursiveCombineAdjacentSubnets($ip4_long_list)));
-                    break;
-                case 0:
-                default:
-                    break;
-            }
+        $ip4_long_list = getIpLongSubnetFromCidr($ip4_list);
+
+        switch (ATK_FEED_OPTIMIZE_LEVEL) {
+            case 1:
+                $ip4_list = formatIpLongSubnetToCidr(combineAdjacentSubnets($ip4_long_list));
+                break;
+            case 2:
+                $ip4_list = formatIpLongSubnetToCidr(recursiveCombineAdjacentSubnets($ip4_long_list));
+                break;
+            case 3:
+                $ip4_list = formatIpLongSubnetToCidr(removeOverlappedSubnets(recursiveCombineAdjacentSubnets($ip4_long_list)));
+                break;
+            default:
+                break;
         }
     }
 }
