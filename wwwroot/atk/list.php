@@ -42,11 +42,11 @@ if ($dispIpGeoInfo) {
         <thead>
             <tr>
                 <th>IP (FQDN)</th>
+                <th>Country</th>
                 <?php if ($dispIpGeoInfo) : ?>
-                    <th>Country</th>
                     <th>City</th>
-                    <th>ASN</th>
                 <?php endif; ?>
+                <th>ASN</th>
                 <th>First report</th>
                 <th>Last report</th>
             </tr>
@@ -61,10 +61,10 @@ if ($dispIpGeoInfo) {
                         <?php endif; ?>
                     </td>
                     <td class="countrycode" data-ccode="<?= htmlentities($rows['ccode']) ?>">
-                        <?= htmlentities($rows['ccode']) ?>
+                        <?= htmlentities($rows['ccode'] ?? 'N/A') ?>
                     </td>
                     <?php if (!$dispIpGeoInfo) : ?>
-                        <td><?= htmlentities($rows['asn']) ?></td>
+                        <td><?= htmlentities($rows['asn'] ?? 'N/A') ?></td>
                     <?php else /* $displayGeoInfo === true */ : ?>
                         <?php
                             $geoInfo = getIpGeoData($geoReader, $rows['ip']);
