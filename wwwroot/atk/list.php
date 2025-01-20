@@ -5,7 +5,7 @@ $p = intval($_GET['p'] ?? 1);
 $offset = ($p - 1) * 100;
 
 $db = createDbLink();
-$atk_list = pg_query_params($db, 'SELECT a.ip, meta_rdns.rdns as rdns,
+$atk_list = pg_query_params($db, 'SELECT a.ip, meta_rdns.rdns as rdns, a.ccode as ccode, a.asn as asn,
                                 extract(epoch from a.addedat) as addedat,
                                 extract(epoch from a.lastseen) as lastseen
                             FROM
@@ -42,11 +42,11 @@ if ($dispIpGeoInfo) {
         <thead>
             <tr>
                 <th>IP (FQDN)</th>
+                <th>Country</th>
                 <?php if ($dispIpGeoInfo) : ?>
-                    <th>Country</th>
                     <th>City</th>
-                    <th>ASN</th>
                 <?php endif; ?>
+                <th>ASN</th>
                 <th>First report</th>
                 <th>Last report</th>
             </tr>
@@ -60,17 +60,15 @@ if ($dispIpGeoInfo) {
                             (<?= $rows['rdns'] ?>)
                         <?php endif; ?>
                     </td>
-                    <?php if ($dispIpGeoInfo) : ?>
+                    <td class="countrycode" data-ccode="<?= htmlentities($rows['ccode']) ?>">
+                        <?= htmlentities($rows['ccode'] ?? 'N/A') ?>
+                    </td>
+                    <?php if (!$dispIpGeoInfo) : ?>
+                        <td><?= htmlentities($rows['asn'] ?? 'N/A') ?></td>
+                    <?php else /* $displayGeoInfo === true */ : ?>
                         <?php
                             $geoInfo = getIpGeoData($geoReader, $rows['ip']);
                         ?>
-                        <?php if ($geoInfo['countryName'] !== null && $geoInfo['countryCode'] !== null) : ?>
-                            <td class="countrycode" data-ccode="<?= htmlentities($geoInfo['countryCode']) ?>">
-                                <?= htmlentities($geoInfo['countryName']) ?> (<?= htmlentities($geoInfo['countryCode']) ?>)
-                            </td>
-                        <?php else : ?>
-                            <td>N/A</td>
-                        <?php endif; ?>
                         <?php if ($geoInfo['cityName'] !== null) : ?>
                             <td><?= htmlentities($geoInfo['cityName']) ?></td>
                         <?php else : ?>
@@ -79,7 +77,8 @@ if ($dispIpGeoInfo) {
                         <?php if ($geoInfo['asn'] !== null) : ?>
                             <td>
                                 <?= htmlentities($geoInfo['asn']) ?>
-                                <?php if ($geoInfo['asName'] !== null): ?> (<?= htmlentities($geoInfo['asName']) ?>)<?php endif; ?></td>
+                                <?php if ($geoInfo['asName'] !== null): ?> (<?= htmlentities($geoInfo['asName']) ?>)<?php endif; ?>
+                            </td>
                         <?php else : ?>
                             <td>N/A</td>
                         <?php endif; ?>
