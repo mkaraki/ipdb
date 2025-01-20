@@ -73,6 +73,14 @@ $noredirect = isset($_POST['noredirect']) && $_POST['noredirect'] === '1';
 $db = createDbLink();
 
 $ip = $_POST['ip'];
+$ip = strtolower(trim($ip));
+
+if (in_array($ip, ATK_IGNORE_IP ?? [])) {
+    if (!$noredirect)
+        header('Location: /atk/list.php?pj_status=0&pj_msg=No+update+(ignored)');
+
+    die('No update (in ignore list)');
+}
 
 $ignore_check = pg_query_params($db, 'SELECT il.id FROM atkDbIgnoreList il WHERE ($1)::inet << il.net', [$ip]);
 if (pg_num_rows($ignore_check) > 0) {
