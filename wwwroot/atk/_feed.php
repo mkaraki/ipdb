@@ -66,7 +66,27 @@ if (in_array('ipv4', $families) && isset($atk_list4)) {
                 $ip4_list[$key] .= '/32';
             }
         }
-        $ip4_list = recursiveCombineAdjacentSubnets($ip4_list);
+        if (!defined('ATK_FEED_OPTIMIZE_LEVEL')) {
+            define('ATK_FEED_OPTIMIZE_LEVEL', 2);
+        } else {
+            switch (ATK_FEED_OPTIMIZE_LEVEL) {
+                case 1:
+                    $ip4_long_list = getIpLongSubnetFromCidr($ip4_list);
+                    $ip4_list = formatIpLongSubnetToCidr(combineAdjacentSubnets($ip4_long_list));
+                    break;
+                case 2:
+                    $ip4_long_list = getIpLongSubnetFromCidr($ip4_list);
+                    $ip4_list = formatIpLongSubnetToCidr(recursiveCombineAdjacentSubnets($ip4_long_list));
+                    break;
+                case 3:
+                    $ip4_long_list = getIpLongSubnetFromCidr($ip4_list);
+                    $ip4_list = formatIpLongSubnetToCidr(removeOverlappedSubnets(recursiveCombineAdjacentSubnets($ip4_long_list)));
+                    break;
+                case 0:
+                default:
+                    break;
+            }
+        }
     }
 }
 if (in_array('ipv6', $families) && isset($atk_list6)) {
