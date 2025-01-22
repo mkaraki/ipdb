@@ -26,5 +26,5 @@ done < <(printf '%s\n' "$ipdb_feed_list")
 
 set +e
 iptables -D INPUT -j "$IPTABLES_CHAIN_NAME" 2>&1 > /dev/null
-iptables -A INPUT -j "$IPTABLES_CHAIN_NAME" 2>&1 > /dev/null
+iptables -I INPUT 1 -j "$IPTABLES_CHAIN_NAME" 2>&1 > /dev/null
 set -e
