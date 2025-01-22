@@ -14,7 +14,7 @@ if (!filter_var($ip, FILTER_VALIDATE_IP)) {
 }
 
 $isPrivate = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE) === false;
-//$ipFamily = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? 'ipv6' : 'ipv4';
+$ipFamily = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ? 'ipv6' : 'ipv4';
 
 if (!$isPrivate) {
     $link = createDbLink();
@@ -27,17 +27,28 @@ if (!$isPrivate) {
     
     $meta_rdns_data = getReverseDnsInfo($link, $ip);
 
+    $rangeInAtkDb = false;
+    if ($ipFamily === 'ipv4') {
+        # Search for `/24` range
+        $atkDbRange = pg_query_params($link, 'SELECT ip, extract(epoch from addedat) as addedat, extract(epoch from lastseen) as lastseen FROM atkIps WHERE ip << $1::inet', [$ip . '/24']);
+
+        $rangeInAtkDb = pg_num_rows($atkDbRange) > 0;
+        if ($rangeInAtkDb) {
+            $atkDbRangeData = pg_fetch_all($atkDbRange);
+        }
+    }
+
     closeDbLink($link);
 }
 
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/table.css">
     <title><?= htmlentities($ip) ?> - IPdb Search</title>
 </head>
 
@@ -45,7 +56,7 @@ if (!$isPrivate) {
     <h1>IPdb <small>search</small></h1>
     <?php if ($isPrivate) : ?>
         <p>IP address <code><?= htmlentities($ip) ?></code> is private or blocked address.</p>
-    <?php elseif ($inAtkDb) : ?>
+    <?php elseif ($inAtkDb || $rangeInAtkDb) : ?>
         <p>IP address <code><?= htmlentities($ip) ?></code> found in following databases.</p>
 
         <?php if ($meta_rdns_data !== null) : ?>
@@ -85,6 +96,29 @@ if (!$isPrivate) {
                 </tbody>
             </table>
         <?php endif; ?>
+
+        <?php if ($rangeInAtkDb) : ?>
+            <h2>Subnet in ATKdb</h2>
+            <table class="border">
+                <thead>
+                    <tr>
+                        <th>IP</th>
+                        <th>First seen</th>
+                        <th>Last seen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($atkDbRangeData as $i) : ?>
+                        <tr>
+                            <td><a href="?q=<?= htmlentities($i['ip']) ?>"><?= htmlentities($i['ip']) ?></a></td>
+                            <td class="unixepoch" data-epoch="<?= $i['addedat'] ?>"><?= strDate($i['addedat']) ?></td>
+                            <td class="unixepoch" data-epoch="<?= $i['lastseen'] ?>"><?= strDate($i['lastseen']) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php endif; ?>
+
         <script src="scripts/global.js"></script>
     <?php else : ?>
         <p>IP address <code><?= htmlentities($ip) ?></code> not found in our databases.</p>
