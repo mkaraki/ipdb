@@ -121,7 +121,7 @@ function prepareIpGeoReader(): array
 }
 
 
-function getIPGeoDataCity($reader, $ip): array
+function getIPGeoDataCity(Reader $reader, string $ip): array
 {
     try {
         $cityRecord = $reader->city($ip);
@@ -145,7 +145,7 @@ function getIPGeoDataCity($reader, $ip): array
     ];
 }
 
-function getIPGeoDataAsn($reader, $ip): array
+function getIPGeoDataAsn(Reader $reader, string $ip): array
 {
     try {
         $asnRecord = $reader->asn($ip);
@@ -166,7 +166,7 @@ function getIPGeoDataAsn($reader, $ip): array
     ];
 }
 
-function getIpGeoData($reader, $ip): array
+function getIpGeoData(array $reader_contains_array, string $ip): array
 {
     $returnData = [
         'countryCode' => null,
@@ -176,15 +176,15 @@ function getIpGeoData($reader, $ip): array
         'asName' => null,
     ];
 
-    if ($reader['cityDb'] !== null) {
-        $cityData = getIpGeoDataCity($reader['cityDb'], $ip);
+    if ($reader_contains_array['cityDb'] !== null) {
+        $cityData = getIpGeoDataCity($reader_contains_array['cityDb'], $ip);
         $returnData['countryCode'] = $cityData['countryCode'];
         $returnData['countryName'] = $cityData['countryName'];
         $returnData['cityName'] = $cityData['cityName'];
     }
 
-    if ($reader['asnDb'] !== null) {
-        $asnData = getIpGeoDataAsn($reader['asnDb'], $ip);
+    if ($reader_contains_array['asnDb'] !== null) {
+        $asnData = getIpGeoDataAsn($reader_contains_array['asnDb'], $ip);
         $returnData['asn'] = $asnData['asn'];
         $returnData['asName'] = $asnData['asName'];
     }
