@@ -28,7 +28,7 @@ if ($dispIpGeoInfo) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Attack Detected IP List</title>
     <link rel="stylesheet" href="../styles/main.css">
-    <link rel="stylesheet" href="/styles/table.css">
+    <link rel="stylesheet" href="../styles/table.css">
 </head>
 
 <body>
@@ -55,7 +55,8 @@ if ($dispIpGeoInfo) {
             <?php for ($i = 0; $i < pg_num_rows($atk_list); $i++) : ?>
                 <?php $rows = pg_fetch_array($atk_list, NULL, PGSQL_ASSOC); ?>
                 <tr>
-                    <td><?= $rows['ip'] ?>
+                    <td>
+                        <a href="../info.php?q=<?= $rows['ip'] ?>"><?= $rows['ip'] ?></a>
                         <?php if ($rows['rdns'] !== null) : ?>
                             (<?= $rows['rdns'] ?>)
                         <?php endif; ?>
