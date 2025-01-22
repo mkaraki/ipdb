@@ -30,9 +30,10 @@ if (!$isPrivate) {
     $rangeInAtkDb = false;
     if ($ipFamily === 'ipv4') {
         # Search for `/24` range
-        $atkDbRange = pg_query_params($link, 'SELECT ip, extract(epoch from addedat) as addedat, extract(epoch from lastseen) as lastseen FROM atkIps WHERE ip << $1::inet', [$ip . '/24']);
+        $atkDbRange = pg_query_params($link, 'SELECT ip, extract(epoch from addedat) as addedat, extract(epoch from lastseen) as lastseen FROM atkIps WHERE ip << $1::inet ORDER BY ip ASC', [$ip . '/24']);
 
-        $rangeInAtkDb = pg_num_rows($atkDbRange) > 0;
+        $countRangeInAtkDb = pg_num_rows($atkDbRange);
+        $rangeInAtkDb = $countRangeInAtkDb > 0;
         if ($rangeInAtkDb) {
             $atkDbRangeData = pg_fetch_all($atkDbRange);
         }
@@ -99,6 +100,7 @@ if (!$isPrivate) {
 
         <?php if ($rangeInAtkDb) : ?>
             <h2>Subnet in ATKdb</h2>
+            <p><?= $countRangeInAtkDb ?> hosts are registered in ATKdb.</p>
             <table class="border">
                 <thead>
                     <tr>
