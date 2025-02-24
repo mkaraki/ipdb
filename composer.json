@@ -1,6 +1,6 @@
 {
     "require-dev": {
-        "vimeo/psalm": "^5.20"
+        "vimeo/psalm": "^6.8"
     },
     "require": {
         "geoip2/geoip2": "~3.1",
