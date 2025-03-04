@@ -48,7 +48,7 @@ $atkIpCnt = pg_fetch_result(pg_query($link, 'SELECT COUNT(*) FROM atkIps'), 0, 0
                 </thead>
                 <tbody>
                     <?php
-                        $countryStats = pg_query($link, 'SELECT ccode, COUNT(*) as cnt FROM atkIps WHERE lastseen >= now() - interval \'30 days\' GROUP BY ccode ORDER BY cnt DESC LIMIT 10');
+                        $countryStats = pg_query($link, 'SELECT ccode, COUNT(*) as cnt FROM atkIps WHERE lastseen >= date_trunc(\'day\', (now() AT TIME ZONE \'UTC\') - interval \'30 days\') GROUP BY ccode ORDER BY cnt DESC LIMIT 10');
                     ?>
                     <?php for ($i = 0; $i < pg_num_rows($countryStats); $i++) : ?>
                         <?php $row = pg_fetch_array($countryStats, NULL, PGSQL_ASSOC); ?>
@@ -79,7 +79,7 @@ $atkIpCnt = pg_fetch_result(pg_query($link, 'SELECT COUNT(*) FROM atkIps'), 0, 0
                 </thead>
                 <tbody>
                     <?php
-                        $asnStats = pg_query($link, 'SELECT asn, COUNT(*) as cnt FROM atkIps WHERE lastseen >= now() - interval \'30 days\' GROUP BY asn ORDER BY cnt DESC LIMIT 10');
+                        $asnStats = pg_query($link, 'SELECT asn, COUNT(*) as cnt FROM atkIps WHERE lastseen >= date_trunc(\'day\', (now() AT TIME ZONE \'UTC\') - interval \'30 days\') GROUP BY asn ORDER BY cnt DESC LIMIT 10');
                     ?>
                     <?php for ($i = 0; $i < pg_num_rows($asnStats); $i++) : ?>
                         <?php $row = pg_fetch_array($asnStats, NULL, PGSQL_ASSOC); ?>
