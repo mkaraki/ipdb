@@ -25,7 +25,7 @@ $atkIpCnt = pg_fetch_result(pg_query($link, 'SELECT COUNT(*) FROM atkIps'), 0, 0
             <tbody>
                 <?php foreach([1, 7, 14, 30, 60, 180, 365] as $day) : ?>
                     <?php
-                        $dayStats = pg_query($link, "SELECT COUNT(*) FROM atkIps WHERE lastseen >= now() - interval '$day days'");
+                        $dayStats = pg_query($link, "SELECT COUNT(*) FROM atkIps WHERE lastseen >= date_trunc('day', (now() AT TIME ZONE 'UTC') - interval '$day days')");
                         $dayCount = pg_fetch_result($dayStats, 0, 0);
                     ?>
                     <tr>
