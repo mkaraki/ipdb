@@ -74,16 +74,57 @@ $db = createDbLink();
 
 $ip = $_POST['ip'];
 $ip = strtolower(trim($ip));
+// Normalize IP address
+$ip = inet_ntop(inet_pton($ip));
 
-if (in_array($ip, ATK_IGNORE_IP ?? [])) {
+if (apcu_exists("atk_posted_{$ip}")) {
+    if (ATK_SKIP_UPDATE_ON_CACHE_HIT) {
+        // Skip update
+        if (!$noredirect)
+            header('Location: /atk/list.php?pj_status=0&pj_msg=Skip+update+(cached)');
+
+        die ("Skip update (cached)");
+    } else {
+        $last_posted = apcu_fetch("atk_posted_{$ip}");
+        if ($rpt_time <= $last_posted) {
+            if (!$noredirect)
+                header('Location: /atk/list.php?pj_status=0&pj_msg=No+update+(cached)');
+
+            die('No update (cached)');
+        } else {
+            // ToDo: remove duplicated code.
+            // This code is same as non cache hit updated code.
+
+            pg_query_params($db, 'UPDATE atkIps SET lastseen = to_timestamp($1) WHERE ip = $2', [$rpt_time, $ip]);
+
+            updateReverseDnsInfo($db, $ip);
+            $geoReader = prepareIpGeoReader();
+            updateAtkIpGeoMetadata($db, $geoReader, $ip);
+
+            if (!$noredirect)
+                header('Location: /atk/list.php?pj_status=0&pj_msg=Updated+database');
+
+            apcu_store("atk_posted_{$ip}", $rpt_time, ATK_POST_CACHE_AGE);
+
+            die('Updated database');
+        }
+    }
+}
+
+if (apcu_exists("atk_ignore_{$ip}")) {
     if (!$noredirect)
-        header('Location: /atk/list.php?pj_status=0&pj_msg=No+update+(ignored)');
+        header('Location: /atk/list.php?pj_status=0&pj_msg=No+update+(ignored,+cached)');
 
-    die('No update (in ignore list)');
+    // Do not update cache age.
+    // This cause un-sync between cache and database.
+
+    die('No update (in ignore list, cached)');
 }
 
 $ignore_check = pg_query_params($db, 'SELECT il.id FROM atkDbIgnoreList il WHERE ($1)::inet << il.net', [$ip]);
 if (pg_num_rows($ignore_check) > 0) {
+    apcu_store("atk_ignore_{$ip}", true, ATK_POST_CACHE_AGE);
+
     if (!$noredirect)
         header('Location: /atk/list.php?pj_status=0&pj_msg=No+update+(ignored)');
 
@@ -101,6 +142,8 @@ if (pg_num_rows($atk_list) > 0) {
         if (!$noredirect)
             header('Location: /atk/list.php?pj_status=0&pj_msg=No+update');
 
+        apcu_store("atk_posted_{$ip}", $rpt_time, ATK_POST_CACHE_AGE);
+
         die('No update');
     } else {
         pg_query_params($db, 'UPDATE atkIps SET lastseen = to_timestamp($1) WHERE ip = $2', [$rpt_time, $ip]);
@@ -111,6 +154,8 @@ if (pg_num_rows($atk_list) > 0) {
 
         if (!$noredirect)
             header('Location: /atk/list.php?pj_status=0&pj_msg=Updated+database');
+
+        apcu_store("atk_posted_{$ip}", $rpt_time, ATK_POST_CACHE_AGE);
 
         die('Updated database');
     }
@@ -127,5 +172,7 @@ closeDbLink($db);
 
 if (!$noredirect)
     header('Location: /atk/list.php?pj_status=0&pj_msg=Added+to+list');
+
+apcu_store("atk_posted_{$ip}", $rpt_time, ATK_POST_CACHE_AGE);
 
 die('Added to list');

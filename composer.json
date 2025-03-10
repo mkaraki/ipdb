@@ -4,6 +4,7 @@
     },
     "require": {
         "geoip2/geoip2": "~3.1",
-      "ext-pgsql": "*"
+      "ext-pgsql": "*",
+      "ext-apcu": "*"
     }
 }
