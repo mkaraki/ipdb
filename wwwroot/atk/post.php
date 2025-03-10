@@ -70,8 +70,6 @@ function updateAtkIpGeoMetadata($db, $reader, $ip): void
 
 $noredirect = isset($_POST['noredirect']) && $_POST['noredirect'] === '1';
 
-$db = createDbLink();
-
 $ip = $_POST['ip'];
 $ip = strtolower(trim($ip));
 // Normalize IP address
@@ -94,6 +92,10 @@ if (apcu_exists("atk_posted_{$ip}")) {
         } else {
             // ToDo: remove duplicated code.
             // This code is same as non cache hit updated code.
+
+            // Create DB connection if update is needed.
+            // Because global db link is created after cached section.
+            $db = createDbLink();
 
             pg_query_params($db, 'UPDATE atkIps SET lastseen = to_timestamp($1) WHERE ip = $2', [$rpt_time, $ip]);
 
@@ -120,6 +122,8 @@ if (apcu_exists("atk_ignore_{$ip}")) {
 
     die('No update (in ignore list, cached)');
 }
+
+$db = createDbLink();
 
 $ignore_check = pg_query_params($db, 'SELECT il.id FROM atkDbIgnoreList il WHERE ($1)::inet << il.net', [$ip]);
 if (pg_num_rows($ignore_check) > 0) {
