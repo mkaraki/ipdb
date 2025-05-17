@@ -1,6 +1,20 @@
 <?php
 require_once __DIR__ . '/../_config.php';
 require_once __DIR__ . '/../vendor/autoload.php';
+
+if (defined('SENTRY_DSN') && !empty(SENTRY_DSN)){
+    \Sentry\init([
+        'dsn' => SENTRY_DSN,
+    ]);
+
+    $is_sentry_usable = true;
+    define("IS_SENTRY_USABLE", true);
+}
+else
+{
+    define("IS_SENTRY_USABLE", false);
+}
+
 use GeoIp2\Database\Reader;
 
 function createDbLink()
@@ -103,14 +117,20 @@ function prepareIpGeoReader(): array
     try {
         $cityDb = new Reader(GEOIP_PARENT . '/GeoLite2-City.mmdb');
     }
-    catch (Exception) {
+    catch (Exception $ex) {
+        if (IS_SENTRY_USABLE) {
+            \Sentry\captureException($ex);
+        }
         $cityDb = null;
     }
 
     try {
         $asnDb = new Reader(GEOIP_PARENT . '/GeoLite2-ASN.mmdb');
     }
-    catch (Exception) {
+    catch (Exception $ex) {
+        if (IS_SENTRY_USABLE) {
+            \Sentry\captureException($ex);
+        }
         $asnDb = null;
     }
 
@@ -126,7 +146,10 @@ function getIPGeoDataCity(Reader $reader, string $ip): array
     try {
         $cityRecord = $reader->city($ip);
     }
-    catch (Exception) {
+    catch (Exception $ex) {
+        if (IS_SENTRY_USABLE) {
+            \Sentry\captureException($ex);
+        }
         return [
             'countryCode' => null,
             'countryName' => null,
@@ -150,7 +173,10 @@ function getIPGeoDataAsn(Reader $reader, string $ip): array
     try {
         $asnRecord = $reader->asn($ip);
     }
-    catch (Exception) {
+    catch (Exception $ex) {
+        if (IS_SENTRY_USABLE) {
+            \Sentry\captureException($ex);
+        }
         return [
             'asn' => null,
             'asName' => null,

@@ -5,6 +5,8 @@
     "require": {
         "geoip2/geoip2": "~3.1",
       "ext-pgsql": "*",
-      "ext-apcu": "*"
+      "ext-apcu": "*",
+        "sentry/sentry": "^4.10",
+      "ext-gd": "*"
     }
 }

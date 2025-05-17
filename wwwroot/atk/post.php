@@ -34,7 +34,10 @@ function updateAtkIpGeoCountryCode($db, $reader, $ip): void
     try {
         $cityData = $reader['cityDb']->city($ip);
     }
-    catch (Exception) {
+    catch (Exception $ex) {
+        if (IS_SENTRY_USABLE) {
+            \Sentry\captureException($ex);
+        }
         pg_query_params($db, 'UPDATE atkIps SET ccode = NULL WHERE ip = $1', [$ip]);
         return;
     }
@@ -52,7 +55,11 @@ function updateAtkIpGeoAsn($db, $reader, $ip): void
     try {
         $asnData = $reader['asnDb']->asn($ip);
     }
-    catch (Exception) {
+    catch (Exception $ex) {
+        if (IS_SENTRY_USABLE)
+        {
+            \Sentry\captureException($ex);
+        }
         pg_query_params($db, 'UPDATE atkIps SET asn = NULL WHERE ip = $1', [$ip]);
         return;
     }
