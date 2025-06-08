@@ -31,9 +31,16 @@ if (!isset($_POST['role_mgr'])) {
 }
 $loginSpan->finish();
 
-if (!isset($_POST['ip']) || !filter_var($_POST['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE)) {
+if (empty($_POST['ip'])) {
     http_response_code(400);
-    die('Bad request');
+    die("Bad request. Empty IP request.");
+}
+
+$_POST['ip'] = trim($_POST['ip']);
+
+if (!filter_var($_POST['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE)) {
+    http_response_code(400);
+    die('Bad request. Invalid IP: ' . $_POST['ip']);
 }
 
 function updateAtkIpGeoCountryCode($db, $reader, $ip): void
