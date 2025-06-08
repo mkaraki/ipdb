@@ -1,15 +1,23 @@
 <?php
+function sortLongIpAndCidrArray($subnets)
+{
+    // Sort subnets in ascending order based on IP value
+    array_multisort($subnets);
+    return $subnets;
+}
+
 /*
  * Combine adjacent subnets
  * This requires LongIP and Prefix format: [LongIP, CIDR]
  */
 function combineAdjacentSubnets(array $subnets): array
 {
-    // Sort subnets in ascending order based on IP value
-    usort($subnets, function ($a, $b) {
-        // Get 32bit integer from IP addressed and compare
-        return $a[0] - $b[0];
-    });
+    $subnets = sortLongIpAndCidrArray($subnets);
+
+    // array_multisort won't get SORT_DESC. So use this.
+    $subnets = array_reverse($subnets);
+
+    var_dump(long2ip($subnets[0][0]));
 
     $combined = [];
 
@@ -26,21 +34,21 @@ function combineAdjacentSubnets(array $subnets): array
     $subnets = array_unique($subnets, SORT_REGULAR);
 
     while (!empty($subnets)) {
-        $current = array_shift($subnets);
-
+        // Get the first element and delete from an array.
+        $current = array_pop($subnets);
         [$currentIpLong, $currentPrefix] = $current;
 
         // Calculate the next possible adjacent IP based on prefix (get broadcast addr + 1)
         $nextIpLong = $currentIpLong + pow(2, (32 - $currentPrefix));
 
+        $subnets_last_idx = count($subnets) - 1;
+
         if (
-            count($subnets) > 0 && // Make sure there is a next subnet
-            $subnets[0][0] == $nextIpLong && $subnets[0][1] == $currentPrefix // Check if next subnet is adjacent
+            $subnets_last_idx >= 0 && // Make sure there is a next subnet
+            $subnets[$subnets_last_idx][0] == $nextIpLong && $subnets[$subnets_last_idx][1] == $currentPrefix // Check if next subnet is adjacent
         ) {
             // If next subnet exists, merge by decreasing prefix
-            array_shift($subnets); // Remove next subnet
-            $currentPrefix--;
-            array_unshift($subnets, [$currentIpLong, $currentPrefix]);
+            $subnets[$subnets_last_idx] = [$currentIpLong, $currentPrefix - 1];
         } else {
             // If next item starts with (broadcast addr + 1), add to combine.
             // Might be able to merge with next item.
