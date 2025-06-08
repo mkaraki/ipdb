@@ -5,6 +5,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 if (defined('SENTRY_DSN') && !empty(SENTRY_DSN)){
     \Sentry\init([
         'dsn' => SENTRY_DSN,
+        'traces_sample_rate' => 0.25,
     ]);
 
     $is_sentry_usable = true;

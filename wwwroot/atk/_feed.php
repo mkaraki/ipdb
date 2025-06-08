@@ -1,6 +1,13 @@
 <?php
 require_once __DIR__ . '/../_init.php';
 require_once __DIR__ . '/../_ipcombine.php';
+
+$transactionContext = \Sentry\Tracing\TransactionContext::make()
+    ->setName('atk/_feed.php')
+    ->setOp('http.server');
+$transaction = \Sentry\startTransaction($transactionContext);
+\Sentry\SentrySdk::getCurrentHub()->setSpan($transaction);
+
 $db = createDbLink();
 
 $range = $_GET['range'] ?? 'host';
@@ -58,12 +65,21 @@ $ip4_list = [];
 $ip6_list = [];
 
 if (in_array('ipv4', $families) && isset($atk_list4)) {
+    $spanContext = \Sentry\Tracing\SpanContext::make()
+        ->setOp('fetch.pg_all_columns.v4');
+    $span = $transaction->startChild($spanContext);
     $ip4_list = pg_fetch_all_columns($atk_list4, 0);
+    $span->finish();
+
     if (
         in_array($range, ['smart', 'net']) &&
         defined('ATK_FEED_OPTIMIZE_LEVEL') &&
         intval(ATK_FEED_OPTIMIZE_LEVEL) > 0
     ) {
+        $spanContext = \Sentry\Tracing\SpanContext::make()
+            ->setOp('optimize.ip4');
+        $span = $transaction->startChild($spanContext);
+
         // If not cidr, add `/32` to each ip
         foreach ($ip4_list as $key => $ip) {
             if (!str_contains($ip, '/')) {
@@ -74,21 +90,43 @@ if (in_array('ipv4', $families) && isset($atk_list4)) {
 
         switch (ATK_FEED_OPTIMIZE_LEVEL) {
             case 1:
+                $childSpanContext = \Sentry\Tracing\SpanContext::make()
+                    ->setOp('optimize.once');
+                $childSpan = $span->startChild($childSpanContext);
                 $ip4_list = formatIpLongSubnetToCidr(combineAdjacentSubnets($ip4_long_list));
+                $childSpan->finish();
                 break;
             case 2:
+                $childSpanContext = \Sentry\Tracing\SpanContext::make()
+                    ->setOp('optimize.recursive');
+                $childSpan = $span->startChild($childSpanContext);
                 $ip4_list = formatIpLongSubnetToCidr(recursiveCombineAdjacentSubnets($ip4_long_list));
+                $childSpan->finish();
                 break;
             case 3:
+                $childSpanContext = \Sentry\Tracing\SpanContext::make()
+                    ->setOp('optimize.recursive.and.clean');
+                $childSpan = $span->startChild($childSpanContext);
                 $ip4_list = formatIpLongSubnetToCidr(removeOverlappedSubnets(recursiveCombineAdjacentSubnets($ip4_long_list)));
+                $childSpan->finish();
                 break;
             default:
                 break;
         }
+
+        $span->finish();
     }
 }
 if (in_array('ipv6', $families) && isset($atk_list6)) {
+    $spanContext = \Sentry\Tracing\SpanContext::make()
+        ->setOp('fetch.pg_all_columns.v4');
+    $span = $transaction->startChild($spanContext);
+
     $ip6_list = pg_fetch_all_columns($atk_list6, 0);
+
+    $span->finish();
 }
 
 closeDbLink($db);
+
+$transaction->finish();

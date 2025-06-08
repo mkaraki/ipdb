@@ -1,8 +1,17 @@
 <?php
 require_once __DIR__ . '/../_init.php';
 
+$transactionContext = \Sentry\Tracing\TransactionContext::make()
+    ->setName('atk/post.php')
+    ->setOp('http.server');
+$transaction = \Sentry\startTransaction($transactionContext);
+\Sentry\SentrySdk::getCurrentHub()->setSpan($transaction);
+
 $rpt_time = time();
 
+$spanContext = \Sentry\Tracing\SpanContext::make()
+    ->setOp('login');
+$loginSpan = $transaction->startChild($spanContext);
 if (!isset($_POST['role_mgr'])) {
     authBasic(USER_ATK_REPORTER);
 } else {
@@ -20,6 +29,7 @@ if (!isset($_POST['role_mgr'])) {
         $rpt_time = intval($_POST['loggedat']);
     }
 }
+$loginSpan->finish();
 
 if (!isset($_POST['ip']) || !filter_var($_POST['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE)) {
     http_response_code(400);
@@ -28,8 +38,17 @@ if (!isset($_POST['ip']) || !filter_var($_POST['ip'], FILTER_VALIDATE_IP, FILTER
 
 function updateAtkIpGeoCountryCode($db, $reader, $ip): void
 {
+    global $transaction;
+
+    $spanContext = \Sentry\Tracing\SpanContext::make()
+        ->setOp('update.geo.country');
+    $span = $transaction->startChild($spanContext);
+
     if (!isset($reader['cityDb']))
+    {
+        $span->finish();
         return;
+    }
 
     try {
         $cityData = $reader['cityDb']->city($ip);
@@ -39,18 +58,29 @@ function updateAtkIpGeoCountryCode($db, $reader, $ip): void
             \Sentry\captureException($ex);
         }
         pg_query_params($db, 'UPDATE atkIps SET ccode = NULL WHERE ip = $1', [$ip]);
+        $span->finish();
         return;
     }
 
     $countryCode = $cityData->country->isoCode ?? null;
 
     pg_query_params($db, 'UPDATE atkIps SET ccode = $1 WHERE ip = $2', [$countryCode, $ip]);
+
+    $span->finish();
 }
 
 function updateAtkIpGeoAsn($db, $reader, $ip): void
 {
-    if (!isset($reader['asnDb']))
+    global $transaction;
+
+    $spanContext = \Sentry\Tracing\SpanContext::make()
+        ->setOp('update.geo.asn');
+    $span = $transaction->startChild($spanContext);
+
+    if (!isset($reader['asnDb'])) {
+        $span->finish();
         return;
+    }
 
     try {
         $asnData = $reader['asnDb']->asn($ip);
@@ -61,12 +91,15 @@ function updateAtkIpGeoAsn($db, $reader, $ip): void
             \Sentry\captureException($ex);
         }
         pg_query_params($db, 'UPDATE atkIps SET asn = NULL WHERE ip = $1', [$ip]);
+        $span->finish();
         return;
     }
 
     $asn = $asnData->autonomousSystemNumber ?? null;
 
     pg_query_params($db, 'UPDATE atkIps SET asn = $1 WHERE ip = $2', [$asn,  $ip]);
+
+    $span->finish();
 }
 
 function updateAtkIpGeoMetadata($db, $reader, $ip): void
@@ -88,6 +121,7 @@ if (apcu_exists("atk_posted_{$ip}")) {
         if (!$noredirect)
             header('Location: /atk/list.php?pj_status=0&pj_msg=Skip+update+(cached)');
 
+        $transaction->finish();
         die ("Skip update (cached)");
     } else {
         $last_posted = apcu_fetch("atk_posted_{$ip}");
@@ -95,6 +129,7 @@ if (apcu_exists("atk_posted_{$ip}")) {
             if (!$noredirect)
                 header('Location: /atk/list.php?pj_status=0&pj_msg=No+update+(cached)');
 
+            $transaction->finish();
             die('No update (cached)');
         } else {
             // ToDo: remove duplicated code.
@@ -115,6 +150,7 @@ if (apcu_exists("atk_posted_{$ip}")) {
 
             apcu_store("atk_posted_{$ip}", $rpt_time, ATK_POST_CACHE_AGE);
 
+            $transaction->finish();
             die('Updated database');
         }
     }
@@ -127,11 +163,15 @@ if (apcu_exists("atk_ignore_{$ip}")) {
     // Do not update cache age.
     // This cause un-sync between cache and database.
 
+    $transaction->finish();
     die('No update (in ignore list, cached)');
 }
 
 $db = createDbLink();
 
+$spanContext =  \Sentry\Tracing\SpanContext::make()
+    ->setOp('check.atk.ignore.db');
+$span = $transaction->startChild($spanContext);
 $ignore_check = pg_query_params($db, 'SELECT il.id FROM atkDbIgnoreList il WHERE ($1)::inet << il.net', [$ip]);
 if (pg_num_rows($ignore_check) > 0) {
     apcu_store("atk_ignore_{$ip}", true, ATK_POST_CACHE_AGE);
@@ -139,8 +179,11 @@ if (pg_num_rows($ignore_check) > 0) {
     if (!$noredirect)
         header('Location: /atk/list.php?pj_status=0&pj_msg=No+update+(ignored)');
 
+    $span->finish();
+    $transaction->finish();
     die('No update (in ignore list)');
 }
+$span->finish();
 
 $atk_list = pg_query_params($db, 'SELECT ip, extract(epoch from lastseen) as lastseen FROM atkIps WHERE ip = $1', [$ip]);
 
@@ -155,6 +198,7 @@ if (pg_num_rows($atk_list) > 0) {
 
         apcu_store("atk_posted_{$ip}", $rpt_time, ATK_POST_CACHE_AGE);
 
+        $transaction->finish();
         die('No update');
     } else {
         pg_query_params($db, 'UPDATE atkIps SET lastseen = to_timestamp($1) WHERE ip = $2', [$rpt_time, $ip]);
@@ -168,6 +212,7 @@ if (pg_num_rows($atk_list) > 0) {
 
         apcu_store("atk_posted_{$ip}", $rpt_time, ATK_POST_CACHE_AGE);
 
+        $transaction->finish();
         die('Updated database');
     }
 }
@@ -186,4 +231,5 @@ if (!$noredirect)
 
 apcu_store("atk_posted_{$ip}", $rpt_time, ATK_POST_CACHE_AGE);
 
+$transaction->finish();
 die('Added to list');
