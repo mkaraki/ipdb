@@ -147,6 +147,13 @@ function getIPGeoDataCity(Reader $reader, string $ip): array
     try {
         $cityRecord = $reader->city($ip);
     }
+    catch (\GeoIp2\Exception\AddressNotFoundException $ex) {
+        return [
+            'countryCode' => null,
+            'countryName' => null,
+            'cityName' => null,
+        ];
+    }
     catch (Exception $ex) {
         if (IS_SENTRY_USABLE) {
             \Sentry\captureException($ex);
@@ -173,6 +180,12 @@ function getIPGeoDataAsn(Reader $reader, string $ip): array
 {
     try {
         $asnRecord = $reader->asn($ip);
+    }
+    catch (\GeoIp2\Exception\AddressNotFoundException $ex) {
+        return [
+            'asn' => null,
+            'asName' => null,
+        ];
     }
     catch (Exception $ex) {
         if (IS_SENTRY_USABLE) {
