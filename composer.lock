@@ -634,16 +634,16 @@
         },
         {
             "name": "sentry/sentry",
-            "version": "4.12.0",
+            "version": "4.14.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getsentry/sentry-php.git",
-                "reference": "0173702ffcbe36ce7638f07f090271294866a7a0"
+                "reference": "a28c4a6f5fda2bf730789a638501d7a737a64eda"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/0173702ffcbe36ce7638f07f090271294866a7a0",
-                "reference": "0173702ffcbe36ce7638f07f090271294866a7a0",
+                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/a28c4a6f5fda2bf730789a638501d7a737a64eda",
+                "reference": "a28c4a6f5fda2bf730789a638501d7a737a64eda",
                 "shasum": ""
             },
             "require": {
@@ -707,7 +707,7 @@
             ],
             "support": {
                 "issues": "https://github.com/getsentry/sentry-php/issues",
-                "source": "https://github.com/getsentry/sentry-php/tree/4.12.0"
+                "source": "https://github.com/getsentry/sentry-php/tree/4.14.1"
             },
             "funding": [
                 {
@@ -719,7 +719,7 @@
                     "type": "custom"
                 }
             ],
-            "time": "2025-06-07T08:37:56+00:00"
+            "time": "2025-06-23T15:25:52+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
