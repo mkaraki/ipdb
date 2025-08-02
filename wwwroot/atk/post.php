@@ -198,6 +198,10 @@ if (!$noredirect)
     http_response_code(303);
 
 if (pg_num_rows($atk_list) > 0) {
+    $spanContext = \Sentry\Tracing\SpanContext::make()
+        ->setOp('update.atk.entry');
+    $span = $transaction->startChild($spanContext);
+
     $already_row = pg_fetch_row($atk_list, NULL, PGSQL_ASSOC);
     if ($already_row['lastseen'] >= $rpt_time) {
         if (!$noredirect)
@@ -222,6 +226,8 @@ if (pg_num_rows($atk_list) > 0) {
         $transaction->finish();
         die('Updated database');
     }
+
+    $span->finish();
 }
 
 updateReverseDnsInfo($db, $ip);
