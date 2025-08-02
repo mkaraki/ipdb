@@ -60,6 +60,9 @@ function updateAtkIpGeoCountryCode($db, $reader, $ip): void
     try {
         $cityData = $reader['cityDb']->city($ip);
     }
+    catch (\GeoIp2\Exception\AddressNotFoundException $ex) {
+        return;
+    }
     catch (Exception $ex) {
         if (IS_SENTRY_USABLE) {
             \Sentry\captureException($ex);
@@ -91,6 +94,9 @@ function updateAtkIpGeoAsn($db, $reader, $ip): void
 
     try {
         $asnData = $reader['asnDb']->asn($ip);
+    }
+    catch (\GeoIp2\Exception\AddressNotFoundException $ex) {
+        return;
     }
     catch (Exception $ex) {
         if (IS_SENTRY_USABLE)
