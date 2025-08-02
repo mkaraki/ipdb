@@ -40,7 +40,7 @@ $_POST['ip'] = trim($_POST['ip']);
 
 if (!filter_var($_POST['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE)) {
     http_response_code(400);
-    die('Bad request. Invalid IP: ' . $_POST['ip']);
+    die('Bad request. Invalid IP: ' . htmlentities($_POST['ip']));
 }
 
 function updateAtkIpGeoCountryCode($db, $reader, $ip): void
