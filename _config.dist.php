@@ -9,9 +9,9 @@ const USER_ATK_MANAGER = [
 const GEOIP_PARENT = '/usr/local/GeoIP';
 
 // 0: No optimization
-// 1: Combine adjacent subnets once (like /24 + /24 -> /23)
+// 1: No optimization ~~Combine adjacent subnets once (like /24 + /24 -> /23)~~
 // 2: Combine adjacent subnets recursively (like /24 x 4 -> /22)
-// 3: Combine adjacent subnets recursively and remove overlap)
+// 3: Same as 2 ~~Combine adjacent subnets recursively and remove overlap)~~
 const ATK_FEED_OPTIMIZE_LEVEL = 2;
 
 const ATK_POST_CACHE_AGE = 60 * 60 * 24 * 7; // 1 week

@@ -1,152 +1,90 @@
 <?php
-function sortLongIpAndCidrArray($subnets)
+
+function format_ip4_obj($ip_obj): string
 {
-    // Sort subnets in ascending order based on IP value
-    array_multisort($subnets);
-    return $subnets;
+    $net = long2ip($ip_obj['network']);
+    $cidr = $ip_obj['cidr'];
+    return "$net/$cidr";
 }
 
-/*
- * Combine adjacent subnets
- * This requires LongIP and Prefix format: [LongIP, CIDR]
- */
-function combineAdjacentSubnets(array $subnets): array
+function create_v4_net(int $addr, int $cidr): array
 {
-    $subnets = sortLongIpAndCidrArray($subnets);
+    $ip_obj = [];
 
-    // array_multisort won't get SORT_DESC. So use this.
-    $subnets = array_reverse($subnets);
+    $ip_obj['cidr'] = $cidr;
+    $cidr_inv = 32 - $cidr;
+    $full_mask = 0b11111111_11111111_11111111_11111111;
+    $mask = $full_mask >> $cidr_inv << $cidr_inv;
+    $mask_inv = (~$mask) & $full_mask;
 
-    var_dump(long2ip($subnets[0][0]));
+    $network = $addr & $mask;
+    $ip_obj['network'] = $network;
 
-    $combined = [];
+    $bcast = $network | $mask_inv;
+    $ip_obj['broadcast'] = $bcast;
 
-    // Make sure $subnets are all network addresses
-    // and normalize IP address format to [32bit integer, prefix]
-    $subnets = array_map(function ($subnet) {
-        [$ip, $prefix] = $subnet;
-        // Get network address
-        $ip = $ip & (0xFFFFFFFF << (32 - $prefix));
-        return [$ip, $prefix];
-    }, $subnets);
+    return $ip_obj;
+}
 
-    // Remove duplicates
-    $subnets = array_unique($subnets, SORT_REGULAR);
+function ip4_combine($ip): array
+{
+    if (count($ip) < 1) {
+        return [$ip, []];
+    }
 
-    while (!empty($subnets)) {
-        // Get the first element and delete from an array.
-        $current = array_pop($subnets);
-        [$currentIpLong, $currentPrefix] = $current;
+    $decided = [];
+    $not_decided = [];
 
-        // Calculate the next possible adjacent IP based on prefix (get broadcast addr + 1)
-        $nextIpLong = $currentIpLong + pow(2, (32 - $currentPrefix));
+    for ($i = 0; $i < count($ip); $i ++)
+    {
+        if (!($i + 1 < count($ip))) {
+            // If this is last, this cannot compare with next value.
+            array_push($decided, $ip[$i]);
+            break; // means continue; because this is last.
+        }
 
-        $subnets_last_idx = count($subnets) - 1;
+        $s = $ip[$i];
+        $l = $ip[$i + 1];
+
+        // Check subnet is connected or not.
+        // if not, there are no chance to combine
+
+        if ($s['broadcast'] + 1 != $l['network']) {
+            array_push($decided, $s);
+            continue;
+        }
+
+        // If CIDR is different, this cannot combine.
+        // So, skip
+
+        if ($s['cidr'] != $l['cidr']) {
+            array_push($not_decided, $s);
+            continue;
+        }
+
+        // Try creating new subnet with larger network.
+        // If network addr and broadcast addr is match to smaller and larger subnet,
+        // this subnet can be merged.
+
+        $try_subnet = create_v4_net($s['network'], $s['cidr'] - 1);
 
         if (
-            $subnets_last_idx >= 0 && // Make sure there is a next subnet
-            $subnets[$subnets_last_idx][0] == $nextIpLong && $subnets[$subnets_last_idx][1] == $currentPrefix // Check if next subnet is adjacent
+            ($try_subnet['network'] == $s['network']) &&
+            ($try_subnet['broadcast'] == $l['broadcast'])
         ) {
-            // If next subnet exists, merge by decreasing prefix
-            $subnets[$subnets_last_idx] = [$currentIpLong, $currentPrefix - 1];
-        } else {
-            // If next item starts with (broadcast addr + 1), add to combine.
-            // Might be able to merge with next item.
-            $combined[] = [$currentIpLong, $currentPrefix];
+            array_push($not_decided, $try_subnet);
+
+            $i++;
+            continue; // This 2 lines make finally $i += 2;
         }
+
+        // else
+
+        array_push($not_decided, $s);
+        // continue;
     }
 
-    return $combined;
-}
-
-/*
- * Binary search for long IP address
- */
-function searchLongIpAddress(array $ary, int $tgt): int|false
-{
-    $left = 0;
-    $right = count($ary) - 1;
-
-    while ($left <= $right) {
-        $mid = $left + intval(($right - $left) / 2);
-
-        if ($ary[$mid] === $tgt) {
-            // Find first occurrence
-            while ($mid > 0 && $ary[$mid - 1] === $tgt) {
-                $mid--;
-            }
-            return $mid;
-        }
-
-        if ($ary[$mid] < $tgt) {
-            $left = $mid + 1;
-        } else {
-            $right = $mid - 1;
-        }
-    }
-
-    return false;
-}
-
-/*
- * Remove subnets that are already covered by larger subnets
- * This requires LongIP and Prefix format: [LongIP, CIDR]
- * and LongIP must be network address
- *
- * @param array $subnets List of subnets in IP/CIDR format
- * @return array Filtered list of subnets where no subnet is a subset of another subnet
- */
-function removeOverlappedSubnets(array $subnets): array
-{
-    $filtered = [];
-
-    // Get minimum CIDR in $subnets
-    $minimumCidr = min(array_column($subnets, 1));
-
-    $allNetworkAddresses = array_column($subnets, 0);
-
-    $subnets = array_unique($subnets, SORT_REGULAR);
-
-    for ($i = 0; $i < count($subnets); $i++) {
-        $isExists = false;
-
-        // Search from larger subnet (might can be overlap this subnet)
-        // Limit minimum CIDR to the smallest CIDR in list
-        for ($searchCidr = $subnets[$i][1] - 1; $searchCidr >= $minimumCidr; $searchCidr--) {
-            $searchNetwork = $subnets[$i][0] & (0xFFFFFFFF << (32 - $searchCidr));
-            $searchNetworkIndex = searchLongIpAddress($allNetworkAddresses, $searchNetwork);
-
-            // Search network (expected larger subnet's network addr) is not exists in list
-            //  => means no larger subnet exists in this size of cidr.
-            if ($searchNetworkIndex === false) {
-                continue;
-            }
-
-            // In case of 2 or more same network exists, search from next index
-            for ($j = $searchNetworkIndex; $j < count($subnets); $j++) {
-                // Skip self search
-                if ($searchNetworkIndex === $i) {
-                    continue;
-                } else if ($subnets[$j][0] !== $searchNetwork) {
-                    // This isn't contains same network (because original array is sorted)
-                    break;
-                } else if (/* $subnets[$j][0] === $searchNetwork && */ $subnets[$j][1] === $searchCidr) {
-                    // This is searching network. Break.
-                    $isExists = true;
-                    break;
-                }
-            }
-
-            if ($isExists) {
-                break;
-            }
-        }
-        if (!$isExists) {
-            $filtered[] = $subnets[$i];
-        }
-    }
-
-    return $filtered;
+    return [$decided, $not_decided];
 }
 
 /*
@@ -159,31 +97,54 @@ function removeOverlappedSubnets(array $subnets): array
  */
 function recursiveCombineAdjacentSubnets(array $subnets): array
 {
-    do {
-        $newSubnets = combineAdjacentSubnets($subnets);
-        $changed = count($newSubnets) !== 0 && ($newSubnets !== $subnets);
-        $subnets = $newSubnets;
-    } while ($changed);
-    return $subnets;
-}
+    $nw_ips = [];
+    $ips = [];
+    foreach ($subnets as $content_line) {
+        $cidr = 32;
+        if (str_contains($content_line, '/')) {
+            $cidr_str = explode('/', $content_line);
+            $content_line = $cidr_str[0];
+            $cidr = intval($cidr_str[1]);
+        }
 
-/*
- * Format IP long and prefix to IP/CIDR format
- */
-function formatIpLongSubnetToCidr(array $ipLongSubnet): array
-{
-    return array_map(function ($subnet) {
-        [$ipLong, $prefix] = $subnet;
-        $ip = long2ip($ipLong);
-        return "$ip/$prefix";
-    }, $ipLongSubnet);
-}
+        $addr = ip2long($content_line);
 
-function getIpLongSubnetFromCidr(array $cidr): array
-{
-    return array_map(function ($subnet) {
-        [$ip, $prefix] = explode('/', $subnet);
-        $ipLong = ip2long($ip);
-        return [$ipLong, $prefix];
-    }, $cidr);
+        if ($addr == 0) {
+            continue;
+        }
+
+        $ip_obj = create_v4_net($addr, $cidr);
+        $nw_ips[] = $ip_obj['network'];
+
+        $ips[] = $ip_obj;
+    }
+
+    array_multisort($nw_ips, SORT_ASC, SORT_REGULAR, $ips);
+    unset($nw_ips);
+
+    $decided = [];
+    $not_decided = $ips;
+
+    while (count($not_decided) != 0) {
+        $data = ip4_combine($not_decided);
+
+        if (count($data[0]) == 0 && array_diff($data[1], $not_decided) === []) {
+            // If there is no new change.
+            break;
+        }
+
+        $decided = array_merge($decided, $data[0]);
+        $not_decided = $data[1];
+
+        uasort($not_decided, function ($a, $b) {
+            if ($a['network'] === $b['network']) {
+                return 0;
+            }
+            return ($a['network'] < $b['network']) ? -1 : 1;
+        });
+    }
+
+    return array_map(function ($ip_obj) {
+        return format_ip4_obj($ip_obj);
+    }, $decided);
 }

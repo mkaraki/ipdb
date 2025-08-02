@@ -72,7 +72,7 @@ if (in_array('ipv4', $families) && isset($atk_list4)) {
     $span->finish();
 
     if (
-        in_array($range, ['smart', 'net']) &&
+        in_array($range, ['smart', 'net', 'host']) &&
         defined('ATK_FEED_OPTIMIZE_LEVEL') &&
         intval(ATK_FEED_OPTIMIZE_LEVEL) > 0
     ) {
@@ -86,28 +86,14 @@ if (in_array('ipv4', $families) && isset($atk_list4)) {
                 $ip4_list[$key] .= '/32';
             }
         }
-        $ip4_long_list = getIpLongSubnetFromCidr($ip4_list);
 
         switch (ATK_FEED_OPTIMIZE_LEVEL) {
-            case 1:
-                $childSpanContext = \Sentry\Tracing\SpanContext::make()
-                    ->setOp('optimize.once');
-                $childSpan = $span->startChild($childSpanContext);
-                $ip4_list = formatIpLongSubnetToCidr(combineAdjacentSubnets($ip4_long_list));
-                $childSpan->finish();
-                break;
             case 2:
+            case 3:
                 $childSpanContext = \Sentry\Tracing\SpanContext::make()
                     ->setOp('optimize.recursive');
                 $childSpan = $span->startChild($childSpanContext);
-                $ip4_list = formatIpLongSubnetToCidr(recursiveCombineAdjacentSubnets($ip4_long_list));
-                $childSpan->finish();
-                break;
-            case 3:
-                $childSpanContext = \Sentry\Tracing\SpanContext::make()
-                    ->setOp('optimize.recursive.and.clean');
-                $childSpan = $span->startChild($childSpanContext);
-                $ip4_list = formatIpLongSubnetToCidr(removeOverlappedSubnets(recursiveCombineAdjacentSubnets($ip4_long_list)));
+                $ip4_list = recursiveCombineAdjacentSubnets($ip4_list);
                 $childSpan->finish();
                 break;
             default:
