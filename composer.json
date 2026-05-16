@@ -1,12 +1,12 @@
 {
     "require-dev": {
-        "vimeo/psalm": "^6.8"
+        "vimeo/psalm": "^6.16"
     },
     "require": {
-        "geoip2/geoip2": "~3.1",
+        "geoip2/geoip2": "~3.3",
       "ext-pgsql": "*",
+      "ext-mysqli": "*",
       "ext-apcu": "*",
-        "sentry/sentry": "^4.10",
-      "ext-gd": "*"
+        "sentry/sentry": "^4.25"
     }
 }
