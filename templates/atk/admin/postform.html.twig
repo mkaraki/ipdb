@@ -37,6 +37,7 @@
 {% endblock %}
 
 {% block postload %}
+    {{ parent() }}
     <script>
         const logdtElem = document.getElementById('loggedat');
 

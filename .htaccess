@@ -2,3 +2,7 @@
    RewriteEngine on
    RewriteRule .* public/index.php [L]
 </IfModule>
+
+<IfModule mod_headers.c>
+    Header set Document-Policy "js-profiling"
+</IfModule>
