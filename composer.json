@@ -4,9 +4,11 @@
     },
     "require": {
         "geoip2/geoip2": "~3.3",
-      "ext-pgsql": "*",
       "ext-mysqli": "*",
       "ext-apcu": "*",
-        "sentry/sentry": "^4.25"
+        "sentry/sentry": "^4.25",
+        "slim/slim": "4.*",
+        "monolog/monolog": "^3.10",
+        "slim/twig-view": "^3.4"
     }
 }

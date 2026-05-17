@@ -1,0 +1,50 @@
+{% extends "_base.html.twig" %}
+
+{% block title %}ATK IP List{% endblock %}
+
+{% block header %}
+    <h1>ATK IP List</h1>
+{% endblock %}
+
+{% block content %}
+    <table class="border">
+        <thead>
+            <tr>
+                <th>IP (FQDN)</th>
+                <th>Country</th>
+                <th>ASN</th>
+                <th>First Seen</th>
+                <th>Last Seen</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for ip in ips %}
+            <tr>
+                <td>
+                    <a href="../info?q={{ ip['ip']|e }}">{{ ip['ip']|e }}</a>
+                    {% if (ip['rdns'] and ip['rdns']['rdns']) %}
+                        ({{ ip['rdns']['rdns']|e }})
+                    {% endif %}
+                </td>
+                <td class="countrycode" data-ccode="{{ ip['country']|e }}">{{ ip['country']|e }}</td>
+                <td>{{ ip['asn']|e }}</td>
+                {% if ip['addedat'] == ip['lastseen'] %}
+                    <td colspan="2" class="unixepoch" data-epoch="{{ ip['addedat']|e }}">{{ ip['addedat_formatted']|e }}</td>
+                {% else %}
+                    <td class="unixepoch" data-epoch="{{ ip['addedat']|e }}">{{ ip['addedat_formatted']|e }}</td>
+                    <td class="unixepoch" data-epoch="{{ ip['lastseen']|e }}">{{ ip['lastseen_formatted']|e }}</td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <p>
+        Page {{ page|e }} of {{ pageCnt|e }} ({{ atkIpCnt|e }} IPs total)
+    </p>
+    {% if page > 1 %}
+        <a href="?page={{ page - 1 }}">Previous</a>
+    {% endif %}
+    {% if page < pageCnt %}
+        <a href="?page={{ page + 1 }}">Next</a>
+    {% endif %}
+{% endblock %}

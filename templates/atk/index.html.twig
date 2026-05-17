@@ -1,0 +1,67 @@
+{% extends "_base.html.twig" %}
+
+{% block title %}ATK DB{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+{% endblock %}
+
+{% block header %}
+    <h1>ATK DB</h1>
+    <p>{{ atkIpCnt }} IPs in list. <a href="list">See full list</a></p>
+{% endblock %}
+
+{% block content %}
+    <section>
+        <h2>Stats</h2>
+        <table>
+            <tbody>
+                {% set day = [1, 7, 14, 30, 60, 180, 365] %}
+                {% for d in day %}
+                    <tr>
+                        <td>Last {{ d }} day{{ d > 1 ? 's' : '' }}</td>
+                        <td>{{ atkPerDay[d] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <section>
+            <h3>Top Countries (Last 30 days)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Country</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for country in countryStats %}
+                        <tr>
+                            <td class="countrycode" data-ccode="{{ country['ccode']|e }}">{{ (country['ccode'] ?? 'Unknown')|e }}</td>
+                            <td>{{ country['cnt'] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+        <section>
+            <h3>Top ASNs (Last 30 days)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ASN</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for asn in asnStats %}
+                        <tr>
+                            <td>{{ (asn['asn'] ?? 'Unknown')|e }}</td>
+                            <td>{{ asn['cnt'] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </section>
+{% endblock %}

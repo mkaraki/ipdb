@@ -1,0 +1,67 @@
+{% extends "_base.html.twig" %}
+
+{% block title %}{{ ip|e }}{% endblock %}
+
+{% block header %}
+    <h1>IPdb Search</h1>
+{% endblock %}
+
+{% block content %}
+    {% if ipIsInvalid %}
+        <p><code>{{ ip|e }}</code> is not a valid IP address.</p>
+    {% elseif ipIsPrivate %}
+        <p><code>{{ ip|e }}</code> is a private IP address.</p>
+    {% elseif ipInAtkRelated %}
+        <p><code>{{ ip|e }}</code> found in following databases.</p>
+
+        {% if meta_rdns_data %}
+        <section>
+            <h2>Reverse DNS</h2>
+            <dl>
+                <dt>rDNS</dt>
+                <dd>{{ meta_rdns_data['rdns']|e }}</dd>
+                <dt>Last checked</dt>
+                <dd class="unixepoch" data-epoch="{{ meta_rdns_data['last_checked'] }}">{{ meta_rdns_data['last_checked_formatted'] }}</dd>
+            </dl>
+        </section>
+        {% endif %}
+
+        {% if ipInAtk %}
+        <section>
+            <h2>ATKdb</h2>
+            <dl>
+                <dt>First seen</dt>
+                <dd class="unixepoch" data-epoch="{{ atk['addedat'] }}">{{ atk['addedat_formatted'] }}</dd>
+                <dt>Last seen</dt>
+                <dd class="unixepoch" data-epoch="{{ atk['lastseen'] }}">{{ atk['lastseen_formatted'] }}</dd>
+            </dl>
+        </section>
+        {% endif %}
+
+        {% if ipInAtkNeighbours %}
+            <section>
+                <h2>Subnets in ATK</h2>
+                <table class="border">
+                    <thead>
+                    <tr>
+                        <th>IP</th>
+                        <th>First seen</th>
+                        <th>Last seen</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for atkNeighbour in atkNeighbours %}
+                        <tr>
+                            <td><a href="?q={{ atkNeighbour['ip']|e }}">{{ atkNeighbour['ip']|e }}</a></td>
+                            <td class="unixepoch" data-epoch="{{ atkNeighbour['addedat'] }}">{{ atkNeighbour['addedat_formatted'] }}</td>
+                            <td class="unixepoch" data-epoch="{{ atkNeighbour['lastseen'] }}">{{ atkNeighbour['lastseen_formatted'] }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+        {% endif %}
+    {% else %}
+        <p><code>{{ ip|e }}</code> is not found in our database.</p>
+    {% endif %}
+{% endblock %}

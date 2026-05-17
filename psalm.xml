@@ -8,7 +8,8 @@
     findUnusedCode="true"
 >
     <projectFiles>
-        <directory name="wwwroot" />
+        <directory name="src" />
+        <directory name="public" />
         <file name="_config.php" />
         <ignoreFiles>
             <directory name="vendor" />

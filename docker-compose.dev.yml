@@ -4,18 +4,16 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     volumes:
-      - ./wwwroot:/var/www/html:ro
-      - ./_config.php:/var/www/_config.php:ro
-      - ./vendor:/var/www/vendor:ro
+      - ./:/var/www/html:ro
     ports:
       - '3380:80'
 
-  postgres:
-    image: postgres:11.1-alpine
+  mariadb:
+    image: mariadb:10.6
     environment:
-      POSTGRES_USER: ipdb
-      POSTGRES_PASSWORD: ipdb
-      POSTGRES_DB: ipdb
+      - MARIADB_ROOT_PASSWORD=secret
+      - MARIADB_DATABASE=ipdb
+      - MARIADB_USER=ipdb
+      - MARIADB_PASSWORD=ipdb
     volumes:
-      - ./postgres:/var/lib/postgresql/data
       - ./dbinit:/docker-entrypoint-initdb.d:ro
