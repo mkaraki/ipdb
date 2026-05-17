@@ -270,7 +270,7 @@ LIMIT 256
 });
 
 // Compatibility endpoints
-$app->get('/wwwroot/atk/post.php', function (Request $request, Response $response, $args) {
+$app->post('/wwwroot/atk/post.php', function (Request $request, Response $response, $args) {
     $res = sharedAtkPostProcess($request, $response, $args);
     if ($res !== null) {
         return $res;
@@ -411,7 +411,7 @@ LIMIT 100 OFFSET ?
     });
 
     // Compatibility endpoint for old ATK bot. New bots should use /atk/post with POST method.
-    $group->get('/post.php', function (Request $request, Response $response, $args) {
+    $group->post('/post.php', function (Request $request, Response $response, $args) {
         $res = sharedAtkPostProcess($request, $response, $args);
         if ($res !== null) {
             return $res;
