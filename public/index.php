@@ -12,7 +12,6 @@ use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 
 use Monolog\Level;
-use Monolog\Logger;
 
 require __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../_config.php';
@@ -23,7 +22,7 @@ require_once __DIR__ . '/../src/IpAccessUtils.php';
 require_once __DIR__ . '/../src/Atk/PostToAtk.php';
 require_once __DIR__ . '/../src/Atk/AtkFeed.php';
 
-$logger = new Logger('app');
+$logger = new \Monolog\Logger('app');
 
 \Sentry\init([
     'dsn' => defined('SENTRY_DSN') ? SENTRY_DSN ?? '' : '',
@@ -50,6 +49,13 @@ $app = AppFactory::create();
 ] = declare_auth_middlewares($app);
 
 $twig = Twig::create(__DIR__ . '/../templates', ['cache' => false]);
+
+$twigEnvironment = $twig->getEnvironment();
+$twigEnvironment->addGlobal('sentryBaggage', \Sentry\getBaggage());
+$twigEnvironment->addGlobal('sentryTrace', \Sentry\getTraceparent());
+$twigEnvironment->addGlobal('sentryDsn', defined('SENTRY_DSN') ? SENTRY_DSN ?? '' : '');
+$twigEnvironment->addGlobal('sentryEnv', APP_ENV ?? 'production');
+
 
 $sentryMiddleware = function (Request $request, RequestHandler $handler) {
     $routeContext = RouteContext::fromRequest($request);

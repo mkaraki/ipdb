@@ -4,6 +4,8 @@
     {% block head %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="baggage" content="{{ sentryBaggage }}"/>
+    <meta name="sentry-trace" content="{{ sentryTrace }}"/>
     <title>{% block title %}{% endblock %} - IPDB</title>
     <link rel="stylesheet" href="/assets/styles/main.css">
     <link rel="stylesheet" href="/assets/styles/table.css">
@@ -25,6 +27,27 @@
     {% endblock %}
 </footer>
 {% block postload %}
+    <script
+            src="https://browser.sentry-cdn.com/10.53.1/bundle.tracing.logs.metrics.min.js"
+            integrity="sha384-FPna/68MCIPTm42h6ETE6ffGuHKomTFa0hdiqN2ujxgbUY/FV2+T/NAMEotvAQST"
+            crossorigin="anonymous"
+    ></script>
+    <script>
+        Sentry.init({
+            dsn: "{{ sentryDsn }}",
+            environment: "{{ sentryEnv }}",
+            integrations: [
+                Sentry.browserTracingIntegration(),
+                Sentry.consoleLoggingIntegration({ levels: ["log", "warn", "error"] }),
+                //Sentry.browserProfilingIntegration(),
+            ],
+            enableLogs: true,
+            tracesSampleRate: 1.0,
+            tracePropagationTargets: [".*"],
+            //profileSessionSampleRate: 1.0,
+            //profileLifecycle: "trace",
+        });
+    </script>
     <script src="/assets/scripts/global.js"></script>
     <script>
         rewriteEpoch();
