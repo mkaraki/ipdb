@@ -44,7 +44,7 @@ function updateReverseDnsInfo($link, $ip): void
         else
         {
             // Update last checked time if DB has it and it's same
-            $err = query_params($link, 'UPDATE meta_rdns SET last_checked = NOW() WHERE ip = ?', 'ss', [$ip]);
+            $err = query_params($link, 'UPDATE meta_rdns SET last_checked = NOW() WHERE ip = ?', 's', [$ip]);
         }
     }
     else
