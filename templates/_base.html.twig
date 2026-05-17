@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - IPDB</title>
+    <link rel="stylesheet" href="/assets/styles/main.css">
+    <link rel="stylesheet" href="/assets/styles/table.css">
+    {% endblock %}
+</head>
+<body>
+<header>
+    {% block header %}{% endblock %}
+    <hr />
+</header>
+<main>{% block content %}{% endblock %}</main>
+<footer>
+    <hr />
+    {% block footer %}
+        <p>
+            This product includes GeoLite2 data created by MaxMind, available from
+            <a href="https://www.maxmind.com">https://www.maxmind.com</a>.
+        </p>
+    {% endblock %}
+</footer>
+{% block postload %}
+    <script src="/assets/scripts/global.js"></script>
+    <script>
+        rewriteEpoch();
+        rewriteCountryCode();
+    </script>
+{% endblock %}
+</body>
+</html>

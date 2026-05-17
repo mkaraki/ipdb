@@ -1,5 +1,4 @@
 <?php
-
 function format_ip4_obj($ip_obj): string
 {
     $net = long2ip($ip_obj['network']);

@@ -1,0 +1,54 @@
+{% extends "_base.html.twig" %}
+
+{% block title %}Ignore List of ATKdb{% endblock %}
+
+{% block header %}
+    <h1>Ignore List of ATKdb</h1>
+{% endblock %}
+
+{% block content %}
+    <form action="add" method="POST">
+        <div>
+            <label for="ip">IP Address</label>
+        </div>
+        <div>
+            <input type="text" name="network" id="ip" required>
+            <label for="cidr">/</label>
+            <input type="number" name="cidr" id="cidr" min="0" max="128" value="32" required>
+        </div>
+        <div>
+            <label for="description">Description</label>
+        </div>
+        <div>
+            <input type="text" name="description" id="description">
+        </div>
+        <div>
+            <input type="submit" value="Add to Ignore List">
+        </div>
+    </form>
+
+    <h2>Current Ignore List</h2>
+    <table class="border">
+        <thead>
+            <tr>
+                <th>Network</th>
+                <th>Description</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in ignoreList %}
+                <tr>
+                    <td>{{ item.network }}/{{ item.cidr }}</td>
+                    <td>{{ item.description }}</td>
+                    <td>
+                        <form action="delete" method="POST" onsubmit="return confirm('Are you sure you want to remove this entry from the ignore list?');">
+                            <input type="hidden" name="id" value="{{ item.id }}">
+                            <input type="submit" value="Remove">
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,23 +1,12 @@
-<?php
-require_once __DIR__ . '/../_init.php';
-authBasic(USER_ATK_MANAGER);
-?>
-<!DOCTYPE html>
-<html lang="en">
+{% extends "_base.html.twig" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../styles/main.css">
-    <link rel="stylesheet" href="../styles/table.css">
-    <title>Batch Add ATK IP Info</title>
-</head>
+{% block title %}Batch Post IP Info to ATK{% endblock %}
 
-<body>
+{% block header %}
+    <h1>Batch Post IP Info to ATK</h1>
+{% endblock %}
 
-    <h1>Batch Add IP Info (ATK)</h1>
-    <hr />
-
+{% block content %}
     <form action="" onsubmit="return false">
         <h2>FortiGate IPS</h2>
         <div>
@@ -32,13 +21,13 @@ authBasic(USER_ATK_MANAGER);
     <div>
         <table class="border">
             <thead>
-                <tr>
-                    <th>Time</th>
-                    <th>[Src]:Port</th>
-                    <th>[Dst]:Port</th>
-                    <th>Msg</th>
-                    <th>Action</th>
-                </tr>
+            <tr>
+                <th>Time</th>
+                <th>[Src]:Port</th>
+                <th>[Dst]:Port</th>
+                <th>Msg</th>
+                <th>Action</th>
+            </tr>
             </thead>
             <tbody id="batch-preview"></tbody>
         </table>
@@ -47,11 +36,12 @@ authBasic(USER_ATK_MANAGER);
             <button type="button" onclick="batchPost(document.getElementById('batch-preview'), this)">Post</button>
         </div>
     </div>
-    <?php require __DIR__ . '/../_legal.php'; ?>
 
+{% endblock %}
 
-    <script src="../scripts/global.js"></script>
-    <script src="../scripts/atk_batchpost.js"></script>
+{% block postload %}
+    {{ parent() }}
+    <script src="/assets/scripts/atk_batchpost.js"></script>
     <script>
         function addLog(logObj) {
             logObj.forEach((v) => {
@@ -122,7 +112,7 @@ authBasic(USER_ATK_MANAGER);
                 }
 
                 let formData = new FormData();
-                formData.append('role_mgr', '1');
+                //formData.append('role_mgr', '1');
                 formData.append('noredirect', '1');
                 formData.append('ip', logData.src);
                 formData.append('loggedat', logData.epoch);
@@ -139,10 +129,10 @@ authBasic(USER_ATK_MANAGER);
                     goNext();
                 }
 
-                fetch('post.php', {
-                        method: 'POST',
-                        body: formData,
-                    })
+                fetch('post', {
+                    method: 'POST',
+                    body: formData,
+                })
                     .then((fetchRes) => {
                         if (fetchRes.status === 303 || fetchRes.status === 200) {
                             v.elem.remove();
@@ -162,6 +152,4 @@ authBasic(USER_ATK_MANAGER);
             post(0);
         }
     </script>
-</body>
-
-</html>
+{% endblock %}
