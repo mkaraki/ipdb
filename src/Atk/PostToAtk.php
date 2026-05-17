@@ -82,7 +82,7 @@ function updateAtkIpGeoAsn($db, $reader, $ip): void {
         }
 
         try {
-            $asnData = $reader['asnDb']->city($ip);
+            $asnData = $reader['asnDb']->asn($ip);
         } catch (\GeoIp2\Exception\AddressNotFoundException $e) {
             // Usual error
 
