@@ -26,7 +26,7 @@
                         ({{ ip['rdns']['rdns']|e }})
                     {% endif %}
                 </td>
-                <td class="countrycode" data-ccode="{{ ip['country']|e }}">{{ ip['country']|e }}</td>
+                <td class="countrycode" data-ccode="{{ ip['ccode']|e }}">{{ ip['ccode']|e }}</td>
                 <td>{{ ip['asn']|e }}</td>
                 {% if ip['addedat'] == ip['lastseen'] %}
                     <td colspan="2" class="unixepoch" data-epoch="{{ ip['addedat']|e }}">{{ ip['addedat_formatted']|e }}</td>
