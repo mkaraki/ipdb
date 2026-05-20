@@ -343,22 +343,23 @@ $app->group('/atk', function (RouteCollectorProxy $group) use($atkBotAuthMiddlew
 
         $ips = query_all_params($link, "
 SELECT
-    ip,
+    atkIps.ip AS ip,
     ccode,
     asn,
     UNIX_TIMESTAMP(lastseen) AS lastseen,
     lastseen AS lastseen_formatted,
     UNIX_TIMESTAMP(addedat) AS addedat,
-    addedat AS addedat_formatted
+    addedat AS addedat_formatted,
+    rdns
 FROM 
     atkIps
+    LEFT JOIN meta_rdns ON atkIps.ip = meta_rdns.ip
 ORDER BY lastseen DESC
 LIMIT 100 OFFSET ?
         ", 'i', [($pageNo - 1) * 100]);
 
-        for ($i = 0; $i < count($ips); $i++) {
+        for ($i = 0; $i < count($ips); $i ++) {
             $ips[$i]['ip'] = formatDbIpForUser($ips[$i]['ip']);
-            $ips[$i]['rdns'] = getReverseDnsInfo($link, $ips[$i]['ip']);
         }
 
         $view = Twig::fromRequest($request);
