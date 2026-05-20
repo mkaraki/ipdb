@@ -294,19 +294,28 @@ $app->group('/atk', function (RouteCollectorProxy $group) use($atkBotAuthMiddlew
         }
         $ipCount = $ipCount['count'];
 
+        $query = "
+    SELECT count, day
+    FROM (
+        SELECT 1 AS day, COUNT(*) AS count FROM atkIps WHERE lastseen >= NOW() - INTERVAL 1 DAY
+        UNION ALL
+        SELECT 7 AS day, COUNT(*) AS count FROM atkIps WHERE lastseen >= NOW() - INTERVAL 7 DAY
+        UNION ALL
+        SELECT 14 AS day, COUNT(*) AS count FROM atkIps WHERE lastseen >= NOW() - INTERVAL 14 DAY
+        UNION ALL
+        SELECT 30 AS day, COUNT(*) AS count FROM atkIps WHERE lastseen >= NOW() - INTERVAL 30 DAY
+        UNION ALL
+        SELECT 60 AS day, COUNT(*) AS count FROM atkIps WHERE lastseen >= NOW() - INTERVAL 60 DAY
+        UNION ALL
+        SELECT 180 AS day, COUNT(*) AS count FROM atkIps WHERE lastseen >= NOW() - INTERVAL 180 DAY
+        UNION ALL
+        SELECT 365 AS day, COUNT(*) AS count FROM atkIps WHERE lastseen >= NOW() - INTERVAL 365 DAY
+    ) AS subquery
+";
+        $results = query_all_params($link, $query);
         $atkPerDay = [];
-        foreach ([1, 7, 14, 30, 60, 180, 365] as $day) {
-            $query_res = query_row_params(
-                $link,
-                "SELECT COUNT(*) AS count FROM atkIps WHERE lastseen >= NOW() - ? OR addedat >= NOW() - ?",
-                "ii",
-                [3_600_000 * $day, 3_600_000 * $day]
-            );
-            if (empty($query_res)) {
-                $atkPerDay[$day] = 'Error';
-                continue;
-            }
-            $atkPerDay[$day] = $query_res['count'];
+        for($i = 0; $i < count($results); $i++) {
+            $atkPerDay[$results[$i]['day']] = $results[$i]['count'];
         }
 
         $countryStats = query_all_params($link, 'SELECT ccode, COUNT(*) as cnt FROM atkIps WHERE lastseen >= NOW() - INTERVAL 30 DAY GROUP BY ccode ORDER BY cnt DESC LIMIT 10');
