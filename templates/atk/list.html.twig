@@ -22,8 +22,8 @@
             <tr>
                 <td>
                     <a href="../info?q={{ ip['ip']|e }}">{{ ip['ip']|e }}</a>
-                    {% if (ip['rdns'] and ip['rdns']['rdns']) %}
-                        ({{ ip['rdns']['rdns']|e }})
+                    {% if (ip['rdns']) %}
+                        ({{ ip['rdns']|e }})
                     {% endif %}
                 </td>
                 <td class="countrycode" data-ccode="{{ ip['ccode']|e }}">{{ ip['ccode']|e }}</td>
