@@ -150,6 +150,7 @@ function sharedAtkPostProcess (Request $request, Response $response, $args) {
 
 if (defined('PROVIDE_ATK_WP_ADMIN_ENDPOINT') && PROVIDE_ATK_WP_ADMIN_ENDPOINT) {
     $app->any('/wp-admin[/{params:.*}]', function (Request $request, Response $response, $args) {
+        postClientToAtkDatabase($request);
         $response->getBody()->write("Error.");
         $response->withStatus(500);
         return $response;
@@ -158,6 +159,7 @@ if (defined('PROVIDE_ATK_WP_ADMIN_ENDPOINT') && PROVIDE_ATK_WP_ADMIN_ENDPOINT) {
 
 if (defined('PROVIDE_ATK_XML_RPC_ENDPOINT') && PROVIDE_ATK_XML_RPC_ENDPOINT) {
     $app->any('/xmlrpc.php', function (Request $request, Response $response, $args) {
+        postClientToAtkDatabase($request);
         $response->getBody()->write("Error.");
         $response->withStatus(500);
         return $response;
@@ -166,6 +168,7 @@ if (defined('PROVIDE_ATK_XML_RPC_ENDPOINT') && PROVIDE_ATK_XML_RPC_ENDPOINT) {
 
 if (defined('PROVIDE_ATK_DOT_ENV_ENDPOINT') && PROVIDE_ATK_DOT_ENV_ENDPOINT) {
     $app->any('/.env', function (Request $request, Response $response, $args) {
+        postClientToAtkDatabase($request);
         $response->getBody()->write("Error.");
         $response->withStatus(500);
         return $response;
@@ -174,6 +177,7 @@ if (defined('PROVIDE_ATK_DOT_ENV_ENDPOINT') && PROVIDE_ATK_DOT_ENV_ENDPOINT) {
 
 if (defined('PROVIDE_ATK_GIT_DIR_ENDPOINT') && PROVIDE_ATK_GIT_DIR_ENDPOINT) {
     $app->any('/.git[/{params:.*}]', function (Request $request, Response $response, $args) {
+        postClientToAtkDatabase($request);
         $response->getBody()->write("Error.");
         $response->withStatus(500);
         return $response;
@@ -360,7 +364,8 @@ SELECT
     UNIX_TIMESTAMP(addedat) AS addedat,
     addedat AS addedat_formatted,
     rdns,
-    attack_count
+    attack_count,
+    is_frontend_attack
 FROM 
     atkIps
     LEFT JOIN meta_rdns ON atkIps.ip = meta_rdns.ip
