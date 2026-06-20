@@ -7,6 +7,13 @@
 {% endblock %}
 
 {% block content %}
+    <dl>
+        <dt>Your IP</dt>
+        <dd>{{ remoteIp|e }}</dd>
+        <dt>Is ignored</dt>
+        <dd>{{ isIgnored ? 'Yes' : 'No' }}</dd>
+    </dl>
+
     <form action="add" method="POST">
         <div>
             <label for="ip">IP Address</label>

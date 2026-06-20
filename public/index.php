@@ -514,9 +514,18 @@ LIMIT 100 OFFSET ?
                     $ignoreList[$i]['network'] = formatDbIpForUser($ignoreList[$i]['network']);
                 }
 
+                $remoteIp = getAccessingIp($request);
+                $isIgnored = false;
+                if (!empty($remoteIp)) {
+                    $dbIp = formatIpForDb($remoteIp);
+                    $isIgnored = checkIpForIgnoredDb($link, $remoteIp, $dbIp);
+                }
+
                 $view = Twig::fromRequest($request);
                 return $view->render($response, 'atk/admin/ignorelist/index.html.twig', [
                     'ignoreList' =>$ignoreList,
+                    'remoteIp' => $remoteIp,
+                    'isIgnored' => $isIgnored,
                 ]);
             });
 
