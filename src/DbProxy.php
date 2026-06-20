@@ -1,6 +1,6 @@
 <?php
 
-const SCHEMA_VERSION = 202605160001;
+const SCHEMA_VERSION = 202605200001;
 
 function db_init() {
     $mysqli = new mysqli(

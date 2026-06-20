@@ -13,6 +13,7 @@
                 <th>IP (FQDN)</th>
                 <th>Country</th>
                 <th>ASN</th>
+                <th>Count</th>
                 <th>First Seen</th>
                 <th>Last Seen</th>
             </tr>
@@ -28,6 +29,7 @@
                 </td>
                 <td class="countrycode" data-ccode="{{ ip['ccode']|e }}">{{ ip['ccode']|e }}</td>
                 <td>{{ ip['asn']|e }}</td>
+                <td>{{ ip['attack_count']|e }}</td>
                 {% if ip['addedat'] == ip['lastseen'] %}
                     <td colspan="2" class="unixepoch" data-epoch="{{ ip['addedat']|e }}">{{ ip['addedat_formatted']|e }}</td>
                 {% else %}

@@ -359,7 +359,8 @@ SELECT
     lastseen AS lastseen_formatted,
     UNIX_TIMESTAMP(addedat) AS addedat,
     addedat AS addedat_formatted,
-    rdns
+    rdns,
+    attack_count
 FROM 
     atkIps
     LEFT JOIN meta_rdns ON atkIps.ip = meta_rdns.ip
