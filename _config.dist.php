@@ -30,4 +30,7 @@ const PROVIDE_ATK_XML_RPC_ENDPOINT = true;
 const PROVIDE_ATK_DOT_ENV_ENDPOINT = true;
 const PROVIDE_ATK_GIT_DIR_ENDPOINT = true;
 
+// If enabled, use `CF-Connecting-IP` for remote ip address detection.
+const IS_CLOUDFLARE_PROXIED = false;
+
 const APP_ENV = 'production';

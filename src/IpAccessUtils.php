@@ -1,9 +1,21 @@
 <?php
 function getAccessingIp(\Psr\Http\Message\ServerRequestInterface $request): string|null {
-    $cfHeader = $request->getHeader('CF-Connecting-IP')[0] ?? null;
+    $cfHeader = null;
+    if (defined('IS_CLOUDFLARE_PROXIED') && IS_CLOUDFLARE_PROXIED) {
+        $cfHeader = $request->getHeader('CF-Connecting-IP')[0] ?? null;
+    }
     $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? null;
 
-    return $cfHeader ?? $remoteAddr ?? null;
+    $ret_ip = $cfHeader ?? $remoteAddr ?? null;
+    if (empty($ret_ip)) {
+        return null;
+    }
+
+    if (!filter_var($ret_ip, FILTER_VALIDATE_IP)) {
+        return null;
+    }
+
+    return $ret_ip;
 }
 
 function validateIpIsPublic(string $ip): bool {
