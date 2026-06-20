@@ -249,6 +249,7 @@ FROM atkIps WHERE
         CONCAT(SUBSTRING(INET6_ATON(?), 1, LENGTH(INET6_ATON(?)) - 1), UNHEX('00')) 
         AND 
         CONCAT(SUBSTRING(INET6_ATON(?), 1, LENGTH(INET6_ATON(?)) - 1), UNHEX('FF'))
+ORDER BY INET6_ATON(ip) ASC
 LIMIT 256
         ", 'ssss', [$dbIp, $dbIp, $dbIp, $dbIp]);
 
