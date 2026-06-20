@@ -192,21 +192,21 @@ ORDER BY NULL");
     }
 }
 
-function postToAtkDatabase($db, $ip, $lastSeen) {
+function postToAtkDatabase($db, $ip, $lastSeen): bool {
     $ip = normalizeIp($ip);
     $dbIp = formatIpForDb($ip);
 
     if (checkIpForIgnoredDb($db, $ip, $dbIp)) {
         db_close($db);
         \Sentry\logger()->info('Posted whitelisted IP', ['ip' => $ip]);
-        return;
+        return false;
     }
 
     $atkList = query_row_params($db, "SELECT id, ip, UNIX_TIMESTAMP(lastseen) as lastseen FROM atkIps WHERE ip = ? LIMIT 1", 's', [$dbIp]);
 
     if ($atkList === false) {
         \Sentry\logger()->warn('Failed to query atkIps for IP', ['ip' => $ip]);
-        return;
+        return false;
     }
     else if ($atkList !== null) {
         $rpt_time = $lastSeen - ATK_POST_GEO_INFO_CACHE_AGE;
@@ -218,12 +218,14 @@ function postToAtkDatabase($db, $ip, $lastSeen) {
             updateReverseDnsInfo($db, $ip);
         }
 
-        $success = query_params($db, 'UPDATE atkIps SET lastseen = FROM_UNIXTIME(?) WHERE id = ?', 'ii', [$lastSeen, $atkList['id']]);
+        $success = query_params($db, 'UPDATE atkIps SET attack_count = attack_count + 1, lastseen = FROM_UNIXTIME(?) WHERE id = ?', 'ii', [$lastSeen, $atkList['id']]);
 
         if ($success === false) {
             \Sentry\logger()->warn('Failed to update lastseen on ATKdb', ['ip' => $ip]);
-            return;
+            return false;
         }
+
+        return true;
     } else {
         // Newly observed
         $success = query_params($db, "INSERT INTO atkIps (ip, addedat, lastseen) VALUES (?, FROM_UNIXTIME(?), FROM_UNIXTIME(?))", 'sii', [$dbIp, $lastSeen, $lastSeen]);
@@ -233,10 +235,10 @@ function postToAtkDatabase($db, $ip, $lastSeen) {
             updateAtkIpGeoMetadata($db, $geoReader, $ip);
             updateReverseDnsInfo($db, $ip);
 
-            return;
+            return true;
         }
 
         \Sentry\logger()->warn('Unable to post newly observed ATK ip to db', ['ip' => $ip]);
-        return;
+        return false;
     }
 }
