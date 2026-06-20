@@ -242,3 +242,21 @@ function postToAtkDatabase($db, $ip, $lastSeen): bool {
         return false;
     }
 }
+
+function postClientToAtkDatabase($request) {
+    $now = time();
+    $db = db_init();
+
+    $remoteIp = getAccessingIp($request);
+    if (empty($remoteIp)) {
+        return;
+    }
+    $dbIp = formatIpForDb($remoteIp);
+
+    $res = postToAtkDatabase($db, $remoteIp, $now);
+    if (!$res) {
+        return;
+    }
+
+    query_params($db, 'UPDATE atkIps SET is_frontend_attack = TRUE WHERE ip = ?', 's', [$dbIp]);
+}
