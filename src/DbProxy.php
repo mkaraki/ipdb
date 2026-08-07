@@ -67,6 +67,7 @@ function query_result_params(mysqli $db, string $sql, string $types = '', array 
         \Sentry\SentrySdk::getCurrentHub()->setSpan($span);
     }
 
+    $stmt = null;
     try {
         $stmt = $db->prepare($sql);
         if (count($params) > 0) {
@@ -75,7 +76,44 @@ function query_result_params(mysqli $db, string $sql, string $types = '', array 
         if (!$stmt->execute()) {
             return false;
         }
-        return $stmt->get_result();
+    } finally {
+        if ($span !== null) {
+            $span->finish();
+            \Sentry\SentrySdk::getCurrentHub()->setSpan($parent);
+        }
+    }
+
+    if ($parent !== null) {
+        $context = \Sentry\Tracing\SpanContext::make()
+            ->setOp('mysqli.get_result')
+            ->setDescription('mysqli_stmt::get_result')
+            ->setData([
+                'db.system' => 'mariadb',
+            ]);
+        $span = $parent->startChild($context);
+        \Sentry\SentrySdk::getCurrentHub()->setSpan($span);
+    }
+    try {
+        $r = $stmt->get_result();
+
+        if ($span !== null) {
+            $fetch_field_info = [];
+            foreach ($r->fetch_fields() as $i => $f) {
+                $fetch_field_info[$i] = [
+                    'name' => $f->name,
+                    'type' => $f->type,
+                    'length' => $f->length,
+                    'max_length' => $f->max_length,
+                    'flags' => $f->flags,
+                ];
+            }
+            $span->setData([
+                'num_rows' => $r->num_rows,
+                'fetch_fields' => $fetch_field_info,
+            ]);
+        }
+
+        return $r;
     } finally {
         if ($span !== null) {
             $span->finish();
