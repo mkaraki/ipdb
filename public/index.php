@@ -231,7 +231,8 @@ SELECT
     UNIX_TIMESTAMP(lastseen) AS lastseen,
     lastseen AS lastseen_formatted,
     UNIX_TIMESTAMP(addedat) AS addedat,
-    addedat AS addedat_formatted
+    addedat AS addedat_formatted,
+    ip_prefix24
 FROM atkIps WHERE ip = ? LIMIT 1', 's', [$dbIp]);
 
     $ipInAtk = !empty($atkInfo);
@@ -244,14 +245,14 @@ SELECT
     lastseen AS lastseen_formatted,
     UNIX_TIMESTAMP(addedat) AS addedat,
     addedat AS addedat_formatted
-FROM atkIps WHERE
-    INET6_ATON(ip) BETWEEN 
-        CONCAT(SUBSTRING(INET6_ATON(?), 1, LENGTH(INET6_ATON(?)) - 1), UNHEX('00')) 
-        AND 
-        CONCAT(SUBSTRING(INET6_ATON(?), 1, LENGTH(INET6_ATON(?)) - 1), UNHEX('FF'))
-ORDER BY INET6_ATON(ip) ASC
+FROM
+    atkIps
+WHERE
+    ip_prefix24 =
+        SUBSTRING(INET6_ATON(?), 1, LENGTH(INET6_ATON(?)) - 1)
+ORDER BY ip_bin ASC
 LIMIT 256
-        ", 'ssss', [$dbIp, $dbIp, $dbIp, $dbIp]);
+        ", 'ss', [$dbIp, $dbIp]);
 
         for ($i = 0; $i < count($atkNeighbours); $i++) {
             $atkNeighbours[$i]['ip'] = formatDbIpForUser($atkNeighbours[$i]['ip']);
@@ -300,28 +301,27 @@ $app->group('/atk', function (RouteCollectorProxy $group) use($atkBotAuthMiddlew
         $ipCount = $ipCount['count'];
 
         $query = "
-    SELECT count, day
-    FROM (
-        SELECT 1 AS day, COUNT(*) AS count FROM atkIps WHERE lastseen >= NOW() - INTERVAL 1 DAY
-        UNION ALL
-        SELECT 7 AS day, COUNT(*) AS count FROM atkIps WHERE lastseen >= NOW() - INTERVAL 7 DAY
-        UNION ALL
-        SELECT 14 AS day, COUNT(*) AS count FROM atkIps WHERE lastseen >= NOW() - INTERVAL 14 DAY
-        UNION ALL
-        SELECT 30 AS day, COUNT(*) AS count FROM atkIps WHERE lastseen >= NOW() - INTERVAL 30 DAY
-        UNION ALL
-        SELECT 60 AS day, COUNT(*) AS count FROM atkIps WHERE lastseen >= NOW() - INTERVAL 60 DAY
-        UNION ALL
-        SELECT 180 AS day, COUNT(*) AS count FROM atkIps WHERE lastseen >= NOW() - INTERVAL 180 DAY
-        UNION ALL
-        SELECT 365 AS day, COUNT(*) AS count FROM atkIps WHERE lastseen >= NOW() - INTERVAL 365 DAY
-    ) AS subquery
+SELECT
+    SUM(lastseen >= NOW() - INTERVAL 1 DAY)   AS count_1,
+    SUM(lastseen >= NOW() - INTERVAL 7 DAY)   AS count_7,
+    SUM(lastseen >= NOW() - INTERVAL 14 DAY)  AS count_14,
+    SUM(lastseen >= NOW() - INTERVAL 30 DAY)  AS count_30,
+    SUM(lastseen >= NOW() - INTERVAL 60 DAY)  AS count_60,
+    SUM(lastseen >= NOW() - INTERVAL 180 DAY) AS count_180,
+    COUNT(*)                                  AS count_365
+FROM atkIps
+WHERE lastseen >= NOW() - INTERVAL 365 DAY;
 ";
         $results = query_all_params($link, $query);
-        $atkPerDay = [];
-        for($i = 0; $i < count($results); $i++) {
-            $atkPerDay[$results[$i]['day']] = $results[$i]['count'];
-        }
+        $atkPerDay = [
+            '1' => $results[0]['count_1'] ?? null,
+            '7' => $results[0]['count_7'] ?? null,
+            '14' => $results[0]['count_14'] ?? null,
+            '30' => $results[0]['count_30'] ?? null,
+            '60' => $results[0]['count_60'] ?? null,
+            '180' => $results[0]['count_180'] ?? null,
+            '365' => $results[0]['count_365'] ?? null
+        ];
 
         $countryStats = query_all_params($link, 'SELECT ccode, COUNT(*) as cnt FROM atkIps WHERE lastseen >= NOW() - INTERVAL 30 DAY GROUP BY ccode ORDER BY cnt DESC LIMIT 10');
         $asnStats = query_all_params($link, 'SELECT asn, COUNT(*) as cnt FROM atkIps WHERE lastseen >= NOW() - INTERVAL 30 DAY GROUP BY asn ORDER BY cnt DESC LIMIT 10');
@@ -370,7 +370,7 @@ SELECT
 FROM 
     atkIps
     LEFT JOIN meta_rdns ON atkIps.ip = meta_rdns.ip
-ORDER BY lastseen DESC
+ORDER BY atkIps.lastseen DESC
 LIMIT 100 OFFSET ?
         ", 'i', [($pageNo - 1) * 100]);
 
