@@ -44,15 +44,15 @@ function getAtkFeedV4Data($link, $range, $sinceUnixTime): array {
     if ($range === 'net') {
         $atk_list4 = query_all_params($link, "
 SELECT DISTINCT
-    INET6_NTOA(CONCAT(SUBSTRING(INET6_ATON(ip), 1, LENGTH(INET6_ATON(ip)) - 1), UNHEX('00'))) AS ip
+    INET6_NTOA(CONCAT(ip_prefix24, UNHEX('00'))) AS ip
 FROM
     atkIps
 WHERE
-    INET6_ATON(ip) BETWEEN
+    ip_bin BETWEEN
         INET6_ATON('::FFFF:0000:0000')
         AND
         INET6_ATON('::FFFF:FFFF:FFFF') AND
-    UNIX_TIMESTAMP(lastseen) >= ?
+    lastseen >= FROM_UNIXTIME(?)
 ORDER BY NULL", 'i', [$sinceUnixTime]);
 
         for ($i = 0; $i < count($atk_list4); $i++) {
@@ -63,7 +63,7 @@ ORDER BY NULL", 'i', [$sinceUnixTime]);
 SELECT 
     CASE 
         WHEN COUNT(*) >= 2 THEN
-            INET6_NTOA(CONCAT(SUBSTRING(INET6_ATON(MIN(ip)), 1, LENGTH(INET6_ATON(MIN(ip))) - 1), UNHEX('00')))
+            INET6_NTOA(CONCAT(ip_prefix24, UNHEX('00')))
         ELSE MIN(ip)
     END AS ip,
     CASE
@@ -72,12 +72,12 @@ SELECT
     END AS cidr
 FROM atkIps
 WHERE
-    INET6_ATON(ip) BETWEEN
+    ip_bin BETWEEN
         INET6_ATON('::FFFF:0000:0000')
         AND
         INET6_ATON('::FFFF:FFFF:FFFF') AND
-    UNIX_TIMESTAMP(lastseen) >= ?
-GROUP BY SUBSTRING(INET6_ATON(ip), 1, LENGTH(INET6_ATON(ip)) - 1)
+    lastseen >= FROM_UNIXTIME(?)
+GROUP BY ip_prefix24
 ORDER BY NULL", 'i', [$sinceUnixTime]);
 
         for ($i = 0; $i < count($atk_list4); $i++) {
@@ -91,11 +91,11 @@ SELECT DISTINCT
 FROM
     atkIps
 WHERE
-    INET6_ATON(ip) BETWEEN
+    ip_bin BETWEEN
         INET6_ATON('::FFFF:0000:0000')
         AND
         INET6_ATON('::FFFF:FFFF:FFFF') AND
-    UNIX_TIMESTAMP(lastseen) >= ?
+    lastseen >= FROM_UNIXTIME(?)
 ORDER BY NULL", 'i', [$sinceUnixTime]);
 
         for ($i = 0; $i < count($atk_list4); $i++) {
@@ -112,15 +112,15 @@ function getAtkFeedV6Data($link, $range, $sinceUnixTime): array {
     if ($range === 'net') {
         $atk_list6 = query_all_params($link, "
 SELECT DISTINCT
-    INET6_NTOA(CONCAT(SUBSTRING(INET6_ATON(ip), 1, 8), UNHEX('0000000000000000'))) AS ip
+    INET6_NTOA(CONCAT(ip_prefix64, UNHEX('0000000000000000'))) AS ip
 FROM
     atkIps
 WHERE
-    INET6_ATON(ip) NOT BETWEEN
+    ip_bin NOT BETWEEN
         INET6_ATON('::FFFF:0000:0000')
         AND
         INET6_ATON('::FFFF:FFFF:FFFF') AND
-    UNIX_TIMESTAMP(lastseen) >= ?
+    lastseen >= FROM_UNIXTIME(?)
 ORDER BY NULL", 'i', [$sinceUnixTime]);
 
         for ($i = 0; $i < count($atk_list6); $i++) {
@@ -131,7 +131,7 @@ ORDER BY NULL", 'i', [$sinceUnixTime]);
 SELECT 
     CASE 
         WHEN COUNT(*) >= 2 THEN
-            INET6_NTOA(CONCAT(SUBSTRING(INET6_ATON(MIN(ip)), 1, 8), UNHEX('0000000000000000')))
+            INET6_NTOA(CONCAT(ip_prefix64, UNHEX('0000000000000000')))
         ELSE MIN(ip)
     END AS ip,
     CASE
@@ -140,12 +140,12 @@ SELECT
     END AS cidr
 FROM atkIps
 WHERE
-    INET6_ATON(ip) NOT BETWEEN
+    ip_bin NOT BETWEEN
         INET6_ATON('::FFFF:0000:0000')
         AND
         INET6_ATON('::FFFF:FFFF:FFFF') AND
-    UNIX_TIMESTAMP(lastseen) >= ?
-GROUP BY SUBSTRING(INET6_ATON(ip), 1, 8)
+    lastseen >= FROM_UNIXTIME(?)
+GROUP BY ip_prefix64
 ORDER BY NULL", 'i', [$sinceUnixTime]);
 
         for ($i = 0; $i < count($atk_list6); $i++) {
@@ -157,11 +157,11 @@ ORDER BY NULL", 'i', [$sinceUnixTime]);
 FROM
     atkIps
 WHERE
-    INET6_ATON(ip) NOT BETWEEN
+    ip_bin NOT BETWEEN
         INET6_ATON('::FFFF:0000:0000')
         AND
         INET6_ATON('::FFFF:FFFF:FFFF') AND
-    UNIX_TIMESTAMP(lastseen) >= ?
+    lastseen >= FROM_UNIXTIME(?)
 ORDER BY NULL", 'i', [$sinceUnixTime]);
     }
 
