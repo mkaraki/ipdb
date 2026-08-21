@@ -34,3 +34,11 @@ const PROVIDE_ATK_GIT_DIR_ENDPOINT = true;
 const IS_CLOUDFLARE_PROXIED = false;
 
 const APP_ENV = 'production';
+
+/*const CUSTOM_HEAD_HTML = <<<HTML
+    <style>
+        body {
+            background-color: #f0f0f0;
+        }
+    </style>
+HTML;*/
