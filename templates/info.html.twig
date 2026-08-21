@@ -2,9 +2,13 @@
 
 {% block title %}{{ ip|e }}{% endblock %}
 
+{% block head %}
+    {{ parent() }}
+    <meta name="robots" content="noindex, follow">
+{% endblock %}
+
 {% block header %}
     <h1>IPdb Search</h1>
-    <meta name="robots" content="noindex, follow">
 {% endblock %}
 
 {% block content %}

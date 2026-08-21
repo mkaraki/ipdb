@@ -2,9 +2,13 @@
 
 {% block title %}ATK IP List{% endblock %}
 
+{% block head %}
+    {{ parent() }}
+    <meta name="robots" content="noindex, follow">
+{% endblock %}
+
 {% block header %}
     <h1>ATK IP List</h1>
-    <meta name="robots" content="noindex, follow">
 {% endblock %}
 
 {% block content %}
