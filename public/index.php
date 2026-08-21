@@ -55,6 +55,7 @@ $twigEnvironment->addGlobal('sentryBaggage', \Sentry\getBaggage());
 $twigEnvironment->addGlobal('sentryTrace', \Sentry\getTraceparent());
 $twigEnvironment->addGlobal('sentryDsn', defined('SENTRY_DSN') ? SENTRY_DSN ?? '' : '');
 $twigEnvironment->addGlobal('sentryEnv', APP_ENV ?? 'production');
+$twigEnvironment->addGlobal('customHeadHtml', defined('CUSTOM_HEAD_HTML') ? CUSTOM_HEAD_HTML ?? '' : '');
 
 
 $sentryMiddleware = function (Request $request, RequestHandler $handler) {
