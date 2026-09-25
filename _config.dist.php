@@ -1,5 +1,5 @@
 <?php
-const DB_HOSTNAME = 'mariadb';
+const DB_HOSTNAME = 'db';
 const DB_USERNAME = 'ipdb';
 const DB_PASSWORD = 'ipdb';
 const DB_DATABASE = 'ipdb';
