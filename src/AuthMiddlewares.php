@@ -48,6 +48,9 @@ function declare_auth_middlewares($app): array {
             return requestAuth($app);
         }
 
+        // ToDo: Add CSRF protection on request.
+        // See: https://github.com/mkaraki/ipdb/pull/69#discussion_r4106763455
+
         return $handler->handle($request);
     };
 
