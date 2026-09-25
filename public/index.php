@@ -542,7 +542,8 @@ LIMIT 100 OFFSET ?
                     return $response->withStatus(400);
                 }
 
-                if (!is_numeric($cidr) || intval($cidr) < 0 || intval($cidr) > 128) {
+                $maxCidr = isIp4($network) ? 32 : 128;
+                if (!is_numeric($cidr) || intval($cidr) < 0 || intval($cidr) > $maxCidr) {
                     $response->getBody()->write('Invalid CIDR value.');
                     return $response->withStatus(400);
                 }
