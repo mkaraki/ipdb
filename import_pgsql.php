@@ -2,7 +2,7 @@
 # ============================================================
 #  ipdb Migration tool (from Postgres to MariaDB)
 #
-# NOTE: You must place `export.json` that exported with `export_pgsql.py` in the same directory as this script.
+# NOTE: You must place `export.json` that exported with `export_pgsql.php` in the same directory as this script.
 # ============================================================
 
 require_once __DIR__ . '/vendor/autoload.php';
