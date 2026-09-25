@@ -1,7 +1,7 @@
 FROM php:8.5-apache
 
 RUN  --mount=type=bind,from=mlocati/php-extension-installer:latest,source=/usr/bin/install-php-extensions,target=/usr/local/bin/install-php-extensions \
-    install-php-extensions mysqli apcu
+    install-php-extensions mysqli apcu opcache excimer
 
 RUN <<EOF cat >> $PHP_INI_DIR/conf.d/apcu.ini
 [apcu]
