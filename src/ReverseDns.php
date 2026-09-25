@@ -51,7 +51,7 @@ function updateReverseDnsInfo($link, $ip): void
     {
         if ($db_rdns === null) {
             // Insert new record if DB doesn't have it
-            $err = query_params($link, 'INSERT INTO meta_rdns (ip, rdns, last_checked) VALUES (?, ?, NOW())', 'ss', [$ip, $rdns]);
+            $err = query_params($link, 'INSERT INTO meta_rdns (ip, rdns, last_checked) VALUES (?, NULL, NOW())', 's', [$ip]);
         }
         else
         {
