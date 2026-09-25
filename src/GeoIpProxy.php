@@ -11,9 +11,7 @@ function prepareIpGeoReader(): array
         $cityDb = new Reader(GEOIP_PARENT . '/GeoLite2-City.mmdb');
     }
     catch (Exception $ex) {
-        if (IS_SENTRY_USABLE) {
-            \Sentry\captureException($ex);
-        }
+        \Sentry\captureException($ex);
         $cityDb = null;
     }
 
@@ -21,9 +19,7 @@ function prepareIpGeoReader(): array
         $asnDb = new Reader(GEOIP_PARENT . '/GeoLite2-ASN.mmdb');
     }
     catch (Exception $ex) {
-        if (IS_SENTRY_USABLE) {
-            \Sentry\captureException($ex);
-        }
+        \Sentry\captureException($ex);
         $asnDb = null;
     }
 
@@ -47,9 +43,7 @@ function getIPGeoDataCity(Reader $reader, string $ip): array
         ];
     }
     catch (Exception $ex) {
-        if (IS_SENTRY_USABLE) {
-            \Sentry\captureException($ex);
-        }
+        \Sentry\captureException($ex);
         return [
             'countryCode' => null,
             'countryName' => null,
@@ -80,9 +74,7 @@ function getIPGeoDataAsn(Reader $reader, string $ip): array
         ];
     }
     catch (Exception $ex) {
-        if (IS_SENTRY_USABLE) {
-            \Sentry\captureException($ex);
-        }
+        \Sentry\captureException($ex);
         return [
             'asn' => null,
             'asName' => null,
