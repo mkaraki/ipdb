@@ -456,7 +456,7 @@ LIMIT 100 OFFSET ?
                 return $res;
             }
 
-            $noRedirect = !empty($_POST['no_redirect']) && $_POST['no_redirect'] === '1';
+            $noRedirect = ($_POST['noredirect'] ?? $_POST['no_redirect'] ?? '') === '1';
             if ($noRedirect) {
                 return $response->withStatus(200);
             } else {
