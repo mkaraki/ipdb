@@ -36,7 +36,7 @@
         {
             "name": "Application version",
             "filePatterns": [
-                "version.go"
+                "app_info.php"
             ],
             "matchStrings": [
                 "const APP_VERSION\\s*=\\s*['\"]v(?<version>\\d+\\.\\d+\\.\\d+)['\"]"
