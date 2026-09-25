@@ -340,7 +340,7 @@ WHERE lastseen >= NOW() - INTERVAL 365 DAY;
 
         $pageNo = 1;
         if (!empty($request->getQueryParams()['page']) && is_numeric($request->getQueryParams()['page'])) {
-            $pageNo = intval($request->getQueryParams()['page']);
+            $pageNo = max(1, intval($request->getQueryParams()['page']));
         }
 
         $atkIpCnt = query_row_params($link, "SELECT COUNT(*) AS count FROM atkIps");
@@ -350,7 +350,7 @@ WHERE lastseen >= NOW() - INTERVAL 365 DAY;
         }
         $atkIpCnt = $atkIpCnt['count'];
 
-        $pageCnt = floor($atkIpCnt / 100);
+        $pageCnt = max(1, (int)ceil($atkIpCnt / 100));
 
         $ips = query_all_params($link, "
 SELECT
