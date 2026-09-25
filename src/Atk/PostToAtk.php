@@ -218,7 +218,7 @@ function postToAtkDatabase($db, $ip, $lastSeen): bool {
             updateReverseDnsInfo($db, $ip);
         }
 
-        $success = query_params($db, 'UPDATE atkIps SET attack_count = attack_count + 1, lastseen = FROM_UNIXTIME(?) WHERE id = ?', 'ii', [$lastSeen, $atkList['id']]);
+        $success = query_params($db, 'UPDATE atkIps SET attack_count = attack_count + 1, lastseen = GREATEST(lastseen, FROM_UNIXTIME(?)) WHERE id = ?', 'ii', [$lastSeen, $atkList['id']]);
 
         if ($success === false) {
             \Sentry\logger()->warn('Failed to update lastseen on ATKdb', ['ip' => $ip]);
