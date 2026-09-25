@@ -1,8 +1,9 @@
 <?php
 # ============================================================
-#  ipdb Migration tool (from Postgres to MariaDB)
+#  ipdb Migration tool (from Postgres (ver.1) to MariaDB (ver.2))
 #
-# NOTE: You must confirm latest DB schema (202408310001.sql) has been applied
+#  This is exporter. Place on old (ipdb v1) code root.
+#  You cannot run this on v2 codebase.
 # ============================================================
 
 require_once __DIR__ . '/_config.php';
