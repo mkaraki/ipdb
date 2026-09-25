@@ -1,0 +1,50 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "packageRules": [
+        {
+            "matchPackageNames": [
+                "actions/*",
+                "docker/*",
+                "sigstore/*",
+                "github/*"
+            ],
+            "matchDatasources": [
+                "github-actions"
+            ],
+            "groupName": "Actions/Docker/SigStore actions"
+        },
+        {
+            "matchPackageNames": [
+                "mkaraki/mkarakiapps-releasing-actions"
+            ],
+            "matchDatasources": [
+                "github-actions"
+            ],
+            "versioning": "semver"
+        },
+        {
+            "matchPackageNames": [
+                "slim/*"
+            ],
+            "matchDatasources": [
+                "packagist"
+            ],
+            "groupName": "Slim Framework"
+        }
+    ],
+    "bumpVersions": [
+        {
+            "name": "Application version",
+            "filePatterns": [
+                "version.go"
+            ],
+            "matchStrings": [
+                "const APP_VERSION\\s*=\\s*['\"]v(?<version>\\d+\\.\\d+\\.\\d+)['\"]"
+            ],
+            "bumpType": "patch"
+        }
+    ],
+    "assignees": [
+        "mkaraki"
+    ]
+}

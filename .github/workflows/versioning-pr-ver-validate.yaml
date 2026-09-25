@@ -1,0 +1,11 @@
+name: '[Versioning] PR Versioning Validation'
+on:
+  pull_request: {}
+
+jobs:
+  validate:
+    uses: mkaraki/mkarakiapps-releasing-actions/.github/workflows/pr-version-validator.yaml@v0.2.8
+    with:
+      target-branch: ${{ github.base_ref }}
+      version-file: app_info.php
+      version-file-format: php
