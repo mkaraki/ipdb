@@ -102,7 +102,6 @@
   <component name="Psalm">
     <Psalm_settings>
       <PsalmConfiguration tool_path="$PROJECT_DIR$/vendor/bin/psalm" />
-      <psalm_fixer_by_interpreter asDefaultInterpreter="true" interpreter_id="f9a79f88-df5c-459d-b964-b1507bac1acb" tool_path="D:\projects\ipdb\vendor\bin\psalm" timeout="60000" />
     </Psalm_settings>
   </component>
   <component name="PsalmOptionsConfiguration">
