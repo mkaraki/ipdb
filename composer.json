@@ -4,8 +4,8 @@
     },
     "require": {
         "geoip2/geoip2": "~3.3",
-      "ext-mysqli": "*",
-      "ext-apcu": "*",
+        "ext-mysqli": "*",
+        "ext-apcu": "*",
         "sentry/sentry": "^4.25",
         "slim/slim": "4.*",
         "monolog/monolog": "^3.10",
