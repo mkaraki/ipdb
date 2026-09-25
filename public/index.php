@@ -153,8 +153,7 @@ if (defined('PROVIDE_ATK_WP_ADMIN_ENDPOINT') && PROVIDE_ATK_WP_ADMIN_ENDPOINT) {
     $app->any('/wp-admin[/{params:.*}]', function (Request $request, Response $response, $args) {
         postClientToAtkDatabase($request);
         $response->getBody()->write("Error.");
-        $response->withStatus(500);
-        return $response;
+        return $response->withStatus(500);
     });
 }
 
@@ -162,8 +161,7 @@ if (defined('PROVIDE_ATK_XML_RPC_ENDPOINT') && PROVIDE_ATK_XML_RPC_ENDPOINT) {
     $app->any('/xmlrpc.php', function (Request $request, Response $response, $args) {
         postClientToAtkDatabase($request);
         $response->getBody()->write("Error.");
-        $response->withStatus(500);
-        return $response;
+        return $response->withStatus(500);
     });
 }
 
@@ -171,8 +169,7 @@ if (defined('PROVIDE_ATK_DOT_ENV_ENDPOINT') && PROVIDE_ATK_DOT_ENV_ENDPOINT) {
     $app->any('/.env', function (Request $request, Response $response, $args) {
         postClientToAtkDatabase($request);
         $response->getBody()->write("Error.");
-        $response->withStatus(500);
-        return $response;
+        return $response->withStatus(500);
     });
 }
 
@@ -180,8 +177,7 @@ if (defined('PROVIDE_ATK_GIT_DIR_ENDPOINT') && PROVIDE_ATK_GIT_DIR_ENDPOINT) {
     $app->any('/.git[/{params:.*}]', function (Request $request, Response $response, $args) {
         postClientToAtkDatabase($request);
         $response->getBody()->write("Error.");
-        $response->withStatus(500);
-        return $response;
+        return $response->withStatus(500);
     });
 }
 
