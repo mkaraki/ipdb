@@ -228,6 +228,8 @@ function postToAtkDatabase($db, $ip, $lastSeen): bool {
         return true;
     } else {
         // Newly observed
+        // Warning: This will fail when executed same time.
+        // See: https://github.com/mkaraki/ipdb/pull/69#discussion_r4106763444
         $success = query_params($db, "INSERT INTO atkIps (ip, addedat, lastseen) VALUES (?, FROM_UNIXTIME(?), FROM_UNIXTIME(?))", 'sii', [$dbIp, $lastSeen, $lastSeen]);
 
         if ($success) {
