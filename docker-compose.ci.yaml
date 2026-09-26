@@ -5,6 +5,6 @@ services:
     network_mode: bridge
     ports:
       - "8080:8080"
-    entrypoint: php
-    command: -S 0.0.0.0:8080 public/index.php
+    entrypoint: []
+    command: php -S 0.0.0.0:8080 public/index.php
     working_dir: /workspaces
