@@ -1,0 +1,53 @@
+name: E2E
+
+on:
+  push: {}
+  pull_request: {}
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cypress:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare config
+        run: cp _config.dist.php _config.php
+
+      - name: Start server
+        run: sudo docker compose -f .devcontainer/docker-compose.yml up app -d php -p 8080:8080 -S 127.0.0.1:8080 public/index.php
+
+      - uses: cypress-io/github-action@v7
+        with:
+          # Run from e2e/ so npx resolves the local node_modules/.bin/cypress.
+          # The base URL comes from cypress.config.js (127.0.0.1:8080), which
+          # matches the port published above.
+          working-directory: e2e
+          # No package.json changes are expected here; installing from the
+          # committed lockfile keeps the Cypress version pinned.
+          install-command: npm ci
+          command: npx cypress run
+
+      - name: Upload Cypress artifacts
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cypress-artifacts
+          path: |
+            e2e/cypress/screenshots
+            e2e/cypress/videos
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Tear down
+        if: always()
+        run: sudo docker compose -f .devcontainer/docker-compose.yml down --volumes --remove-orphans --rmi all
