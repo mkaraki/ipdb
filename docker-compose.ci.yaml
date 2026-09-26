@@ -1,0 +1,9 @@
+# This is override compose.yaml for .devcontainer/docker-compose.yml
+
+services:
+  app:
+    network_mode: !reset null
+    ports:
+      - "8080:8080"
+    entrypoint: php
+    command: -S 0.0.0.0:8080 public/index.php
