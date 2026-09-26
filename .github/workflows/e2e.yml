@@ -24,7 +24,7 @@ jobs:
         run: cp _config.dist.php _config.php
 
       - name: Start server
-        run: sudo docker compose -f .devcontainer/docker-compose.yml -f docker-compose.ci.yaml run -d --service-ports
+        run: sudo docker compose -f .devcontainer/docker-compose.yml -f docker-compose.ci.yaml run -d --service-ports app
 
       - uses: cypress-io/github-action@v7
         with:
