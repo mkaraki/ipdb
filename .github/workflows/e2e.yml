@@ -23,11 +23,11 @@ jobs:
       - name: Prepare config
         run: cp _config.dist.php _config.php
 
+      - name: Install dependencies
+        run: sudo docker compose -f .devcontainer/docker-compose.yml -f docker-compose.ci.yaml run app php /usr/local/bin/composer install
+
       - name: Start server
         run: sudo docker compose -f .devcontainer/docker-compose.yml -f docker-compose.ci.yaml run -d -p 8080:8080 app
-
-      - name: Install dependencies
-        run: sudo docker compose -f .devcontainer/docker-compose.yml -f docker-compose.ci.yaml exec app php /usr/local/bin/composer install
 
       - uses: cypress-io/github-action@v7
         with:
