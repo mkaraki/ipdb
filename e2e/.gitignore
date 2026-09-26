@@ -146,4 +146,7 @@ vite.config.ts.timestamp-*
 .astro/
 
 # Turbo Repo
-.turbo
+
+# Cypress
+cypress/screenshots
+cypress/videos
