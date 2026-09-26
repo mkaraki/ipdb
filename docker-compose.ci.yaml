@@ -2,7 +2,8 @@
 
 services:
   app:
-    network_mode: bridge
+    network_mode: !reset null
+    #network_mode: bridge
     ports:
       - "8080:8080"
     entrypoint: []
