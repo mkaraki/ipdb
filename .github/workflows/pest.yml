@@ -23,20 +23,26 @@ jobs:
       - name: Prepare config
         run: cp _config.dist.php _config.php
 
+      - name: Pull Docker image
+        run: sudo docker compose -f .devcontainer/docker-compose.yml -f docker-compose.ci.yaml pull
+
+      - name: Build Docker image
+        run: sudo docker compose -f .devcontainer/docker-compose.yml -f docker-compose.ci.yaml build
+
       - name: Install composer dependencies
-        run: sudo docker compose -f .devcontainer/docker-compose.yml -f docker-compose.ci.yaml run app composer install --no-interaction --prefer-dist --optimize-autoloader
+        run: sudo docker compose -f .devcontainer/docker-compose.yml -f docker-compose.ci.yaml run --rm app composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Install node dependencies
-        run: sudo docker compose -f .devcontainer/docker-compose.yml -f docker-compose.ci.yaml run app npm ci
-
-      - name: Install playwright
-        run: sudo docker compose -f .devcontainer/docker-compose.yml -f docker-compose.ci.yaml run app npx playwright install --with-deps
+        run: sudo docker compose -f .devcontainer/docker-compose.yml -f docker-compose.ci.yaml run --rm app npm ci
 
       - name: Start server
         run: sudo docker compose -f .devcontainer/docker-compose.yml -f docker-compose.ci.yaml run -d -p 8080:8080 app
 
+      - name: Install playwright
+        run: sudo docker compose -f .devcontainer/docker-compose.yml -f docker-compose.ci.yaml exec app npx playwright install --with-deps
+
       - name: Run tests
-        run: sudo docker compose -f .devcontainer/docker-compose.yml -f docker-compose.ci.yaml run app ./vendor/bin/pest --ci
+        run: sudo docker compose -f .devcontainer/docker-compose.yml -f docker-compose.ci.yaml exec app ./vendor/bin/pest --ci
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
