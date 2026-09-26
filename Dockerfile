@@ -2,7 +2,7 @@ FROM composer AS reqs
 
 WORKDIR /var/www/html/
 
-COPY composer.json composer.lock /var/www/html/
+COPY --exclude=vendor . /var/www/html/
 
 RUN composer install --ignore-platform-reqs
 
