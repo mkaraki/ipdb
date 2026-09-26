@@ -4,11 +4,13 @@ const DB_USERNAME = 'ipdb';
 const DB_PASSWORD = 'ipdb';
 const DB_DATABASE = 'ipdb';
 
+// Password hashes (bcrypt, cost 12). Password for every account below: "password"
+// Regenerate with: php -r 'echo password_hash("password", PASSWORD_BCRYPT, ["cost" => 12]), PHP_EOL;'
 const USER_ATK_REPORTER = [
-    'example' => 'INVALID HASH',
+    'example' => '$2y$12$2p./B1TfKNus.Q.Xj9u6n.erTjbWkziR5Cqr0Cyko7ICyPegaQaAK', // password
 ];
 const USER_ATK_MANAGER = [
-    'admin' => 'INVALID HASH',
+    'admin' => '$2y$12$2p./B1TfKNus.Q.Xj9u6n.erTjbWkziR5Cqr0Cyko7ICyPegaQaAK', // password
 ];
 
 const GEOIP_PARENT = '/usr/local/GeoIP';

@@ -215,7 +215,8 @@ $app->get('/info', function (Request $request, Response $response, $args) {
         return $response->withStatus(500);
     }
 
-    $metaRdnsData = getReverseDnsInfo($db, $ip);
+    $reverseDnsService = new ReverseDnsService(new ReverseDnsRepository(), new ReverseDnsResolver());
+    $metaRdnsData = $reverseDnsService->get($db, $ip);
     if ($metaRdnsData !== null) {
         $metaRdnsData['last_checked_formatted'] = date('Y/m/d H:i:s', $metaRdnsData['last_checked']);
     }

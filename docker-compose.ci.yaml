@@ -1,0 +1,11 @@
+# This is override compose.yaml for .devcontainer/docker-compose.yml
+
+services:
+  app:
+    network_mode: !reset null
+    #network_mode: bridge
+    ports:
+      - "8080:8080"
+    entrypoint: []
+    command: php -S 0.0.0.0:8080 public/index.php
+    working_dir: /workspaces

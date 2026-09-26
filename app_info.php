@@ -1,2 +1,2 @@
 <?php
-const APP_VERSION = '2.0.0-maria-migrate+build1';
+const APP_VERSION = '2.0.0';

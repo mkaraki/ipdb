@@ -26,7 +26,7 @@
                 <dt>rDNS</dt>
                 <dd>{{ meta_rdns_data['rdns']|e }}</dd>
                 <dt>Last checked</dt>
-                <dd class="unixepoch" data-epoch="{{ meta_rdns_data['last_checked'] }}">{{ meta_rdns_data['last_checked_formatted'] }}</dd>
+                <dd class="unixepoch" data-test="rdns-last-checked-value" data-epoch="{{ meta_rdns_data['last_checked'] }}">{{ meta_rdns_data['last_checked_formatted'] }}</dd>
             </dl>
         </section>
         {% endif %}
@@ -36,9 +36,9 @@
             <h2>ATKdb</h2>
             <dl>
                 <dt>First seen</dt>
-                <dd class="unixepoch" data-epoch="{{ atk['addedat'] }}">{{ atk['addedat_formatted'] }}</dd>
+                <dd class="unixepoch" data-test="atk-first-seen-value" data-epoch="{{ atk['addedat'] }}">{{ atk['addedat_formatted'] }}</dd>
                 <dt>Last seen</dt>
-                <dd class="unixepoch" data-epoch="{{ atk['lastseen'] }}">{{ atk['lastseen_formatted'] }}</dd>
+                <dd class="unixepoch" data-test="atk-last-seen-value" data-epoch="{{ atk['lastseen'] }}">{{ atk['lastseen_formatted'] }}</dd>
             </dl>
         </section>
         {% endif %}

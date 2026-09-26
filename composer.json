@@ -1,6 +1,9 @@
 {
     "require-dev": {
-        "vimeo/psalm": "^6.16"
+        "vimeo/psalm": "^6.16",
+        "pestphp/pest": "^4.7",
+        "pestphp/pest-plugin-browser": "^4.3",
+        "mockery/mockery": "^1.6"
     },
     "require": {
         "geoip2/geoip2": "~3.3",
@@ -10,5 +13,18 @@
         "slim/slim": "4.*",
         "monolog/monolog": "^3.10",
         "slim/twig-view": "^3.4"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "autoload-dev": {
+        "classmap": [
+            "tests"
+        ]
+    },
+    "scripts": {
+        "test": "pest"
     }
 }

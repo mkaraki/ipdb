@@ -4,3 +4,9 @@
 /.history
 /GeoIP
 /export*.json
+
+# npm
+node_modules
+
+# Pest Browser Tests
+tests/Browser/Screenshots

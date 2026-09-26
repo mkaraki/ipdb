@@ -26,6 +26,7 @@
 	// "remoteUser": "root"
 
   "postStartCommand": [
-    "composer install"
+    "composer install",
+    "npx playwright install --with-deps"
   ]
 }
