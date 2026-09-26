@@ -26,6 +26,9 @@ jobs:
       - name: Start server
         run: sudo docker compose -f .devcontainer/docker-compose.yml -f docker-compose.ci.yaml run -d -p 8080:8080 app
 
+      - name: Install dependencies
+        run: sudo docker compose -f .devcontainer/docker-compose.yml -f docker-compose.ci.yaml exec app php /usr/local/bin/composer install
+
       - uses: cypress-io/github-action@v7
         with:
           # Run from e2e/ so npx resolves the local node_modules/.bin/cypress.
