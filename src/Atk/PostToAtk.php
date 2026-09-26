@@ -204,6 +204,8 @@ function postToAtkDatabase($db, $ip, $lastSeen): bool {
 
     $atkList = query_row_params($db, "SELECT id, ip, UNIX_TIMESTAMP(lastseen) as lastseen FROM atkIps WHERE ip = ? LIMIT 1", 's', [$dbIp]);
 
+    $reverseDnsService = new ReverseDnsService(new ReverseDnsRepository(), new ReverseDnsResolver());
+
     if ($atkList === false) {
         \Sentry\logger()->warn('Failed to query atkIps for IP', ['ip' => $ip]);
         return false;
@@ -215,7 +217,7 @@ function postToAtkDatabase($db, $ip, $lastSeen): bool {
             // ATKdb Information expired. Refresh it.
             $geoReader = prepareIpGeoReader();
             updateAtkIpGeoMetadata($db, $geoReader, $ip);
-            updateReverseDnsInfo($db, $ip);
+            $reverseDnsService->update($db, $ip);
         }
 
         $success = query_params($db, 'UPDATE atkIps SET attack_count = attack_count + 1, lastseen = GREATEST(lastseen, FROM_UNIXTIME(?)) WHERE id = ?', 'ii', [$lastSeen, $atkList['id']]);
@@ -235,7 +237,7 @@ function postToAtkDatabase($db, $ip, $lastSeen): bool {
         if ($success) {
             $geoReader = prepareIpGeoReader();
             updateAtkIpGeoMetadata($db, $geoReader, $ip);
-            updateReverseDnsInfo($db, $ip);
+            $reverseDnsService->update($db, $ip);
 
             return true;
         }

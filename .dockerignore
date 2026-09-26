@@ -1,0 +1,11 @@
+# Dependencies: reinstalled inside the image, and node_modules symlinks break
+# the build context on Windows.
+vendor
+node_modules
+**/node_modules
+
+# Local-only files.
+.git
+.github
+_config.php
+e2e

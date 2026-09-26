@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "test": "cypress run"
+  },
   "devDependencies": {
     "cypress": "^16.1.0"
   }

@@ -1,7 +1,7 @@
 <?php
 # Source: https://qiita.com/keitaromiura/items/984cef948668f06ba92c
 
-function conevrt_addr_mask(string $ip, int $subnet): int|string
+function convert_addr_mask(string $ip, int $subnet): int|string
 {
     $addr = inet_pton($ip);
     $len = 8 * strlen($addr);
@@ -25,8 +25,8 @@ function conevrt_addr_mask(string $ip, int $subnet): int|string
 }
 
 function CheckIpInSubnet(string $needle, string $networkIp, int $cidr): bool {
-    $chk_mask = conevrt_addr_mask($networkIp, $cidr);
-    $ip_mask  = conevrt_addr_mask($needle, $cidr);
+    $chk_mask = convert_addr_mask($networkIp, $cidr);
+    $ip_mask  = convert_addr_mask($needle, $cidr);
     if ($chk_mask === $ip_mask) {
         return true;
     }
