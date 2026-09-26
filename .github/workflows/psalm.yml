@@ -33,7 +33,7 @@ jobs:
         run: cp _config.dist.php _config.php
 
       - name: Psalm Security Scan
-        uses: docker://ghcr.io/psalm/psalm-github-actions
+        uses: docker://ghcr.io/psalm/psalm-github-actions:6.18.0
         with:
           composer_ignore_platform_reqs: true
           security_analysis: true

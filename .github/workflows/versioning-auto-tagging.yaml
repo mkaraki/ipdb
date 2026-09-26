@@ -1,0 +1,15 @@
+name: '[Versioning] Auto Tagging'
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  auto-tag:
+    uses: mkaraki/mkarakiapps-releasing-actions/.github/workflows/auto-tag.yaml@v0.2.8
+    with:
+      version-file: app_info.php
+      version-file-format: php

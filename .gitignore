@@ -2,3 +2,5 @@
 /_config.php
 /vendor
 /.history
+/GeoIP
+/export*.json
