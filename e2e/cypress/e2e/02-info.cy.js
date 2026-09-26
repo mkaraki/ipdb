@@ -15,12 +15,6 @@ describe("IP info page", () => {
     });
   });
 
-  it("rejects a malformed IP", () => {
-    visitInfo("notanip");
-    mainText().should("eq", "notanip is not a valid IP address.");
-    cy.title().should("eq", "notanip - IPDB");
-  });
-
   it("rejects private IPv4 ranges", () => {
     ["10.0.0.1", "172.16.0.1", "192.168.0.1"].forEach((ip) => {
       visitInfo(ip);
@@ -31,13 +25,6 @@ describe("IP info page", () => {
   it("rejects private IPv6 ranges", () => {
     visitInfo("fd00::1");
     mainText().should("eq", "fd00::1 is a private IP address.");
-  });
-
-  it("reports an IP that is absent from ATKdb", () => {
-    // The neighbours query is per /24, so the whole block has to be empty.
-    cy.unlistBlock("192.0.2.");
-    visitInfo("192.0.2.1");
-    mainText().should("eq", "192.0.2.1 is not found in our database.");
   });
 
   it("marks the page noindex", () => {
@@ -93,13 +80,5 @@ describe("IP info page", () => {
     cy.contains("h2", "Subnets in ATK").should("be.visible");
   });
 
-  it("handles IPv6 lookups and skips the /24 neighbour table", () => {
-    cy.unlistIp(V6);
-    cy.postIpAsBot(V6).its("status").should("eq", 200);
-
-    cy.visit(`/info?q=${V6}`);
-    cy.get("main").should("contain.text", `${V6} found in following databases.`);
-    cy.contains("h2", "ATKdb").should("be.visible");
-    cy.contains("h2", "Subnets in ATK").should("not.exist");
-  });
+  // Some tests are migrated to Pest Browser Testing.
 });
