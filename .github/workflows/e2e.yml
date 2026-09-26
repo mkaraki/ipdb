@@ -24,7 +24,7 @@ jobs:
         run: cp _config.dist.php _config.php
 
       - name: Start server
-        run: sudo docker compose -f .devcontainer/docker-compose.yml run app -d -p 8080:8080 php -S 127.0.0.1:8080 public/index.php
+        run: sudo docker compose -f .devcontainer/docker-compose.yml run app -d -p 8080:8080 --entrypoint php -S 127.0.0.1:8080 public/index.php
 
       - uses: cypress-io/github-action@v7
         with:
