@@ -39,7 +39,7 @@
                 "app_info.php"
             ],
             "matchStrings": [
-                "const APP_VERSION\\s*=\\s*['\"]v(?<version>\\d+\\.\\d+\\.\\d+)['\"]"
+                "const APP_VERSION\\s*=\\s*['\"]v?(?<version>\\d+\\.\\d+\\.\\d+)['\"]"
             ],
             "bumpType": "patch"
         }
