@@ -45,7 +45,7 @@ jobs:
         run: sudo docker compose -f .devcontainer/docker-compose.yml -f docker-compose.ci.yaml exec app ./vendor/bin/pest --ci
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: cypress-artifacts
