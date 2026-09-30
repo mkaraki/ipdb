@@ -8,26 +8,28 @@
                 "sigstore/*",
                 "github/*"
             ],
-            "matchDatasources": [
+            "matchManagers": [
                 "github-actions"
             ],
-            "groupName": "Actions/Docker/SigStore actions"
+            "groupName": "Actions/Docker/SigStore actions",
+            "automerge": true
         },
         {
             "matchPackageNames": [
                 "mkaraki/mkarakiapps-releasing-actions"
             ],
-            "matchDatasources": [
+            "matchManagers": [
                 "github-actions"
             ],
-            "versioning": "semver"
+            "versioning": "semver",
+            "automerge": true
         },
         {
             "matchPackageNames": [
                 "slim/*"
             ],
-            "matchDatasources": [
-                "packagist"
+            "matchManagers": [
+                "composer"
             ],
             "groupName": "Slim Framework"
         }
