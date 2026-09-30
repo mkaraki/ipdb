@@ -32,6 +32,14 @@
                 "composer"
             ],
             "groupName": "Slim Framework"
+        },
+        {
+            "matchPackageNames": [
+                "pestphp/*",
+                "vimeo/psalm",
+                "cypress"
+            ],
+            "groupName": "Testing frameworks"
         }
     ],
     "bumpVersions": [
