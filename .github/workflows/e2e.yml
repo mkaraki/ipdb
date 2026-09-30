@@ -41,7 +41,7 @@ jobs:
           command: npx cypress run
 
       - name: Upload Cypress artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: cypress-artifacts
