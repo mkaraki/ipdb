@@ -1,8 +1,8 @@
 {
     "require-dev": {
         "vimeo/psalm": "^6.16",
-        "pestphp/pest": "^4.7",
-        "pestphp/pest-plugin-browser": "^4.3",
+        "pestphp/pest": "^5.0",
+        "pestphp/pest-plugin-browser": "^5.0",
         "mockery/mockery": "^1.6"
     },
     "require": {
