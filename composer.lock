@@ -4895,16 +4895,16 @@
         },
         {
             "name": "pestphp/pest-plugin-browser",
-            "version": "v5.0.1",
+            "version": "v5.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pestphp/pest-plugin-browser.git",
-                "reference": "8f1c2103dea37f68a674e59869e42a80fbf8a679"
+                "reference": "60142e7519b582c28303ec44db5d11da9fe908ad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pestphp/pest-plugin-browser/zipball/8f1c2103dea37f68a674e59869e42a80fbf8a679",
-                "reference": "8f1c2103dea37f68a674e59869e42a80fbf8a679",
+                "url": "https://api.github.com/repos/pestphp/pest-plugin-browser/zipball/60142e7519b582c28303ec44db5d11da9fe908ad",
+                "reference": "60142e7519b582c28303ec44db5d11da9fe908ad",
                 "shasum": ""
             },
             "require": {
@@ -4912,18 +4912,18 @@
                 "amphp/http-server": "^3.4.6",
                 "amphp/websocket-client": "^2.0.2",
                 "ext-sockets": "*",
-                "pestphp/pest": "^5.0.4",
+                "pestphp/pest": "^5.2.1",
                 "pestphp/pest-plugin": "^5.0.0",
                 "php": "^8.4",
-                "symfony/process": "^8.1.0"
+                "symfony/process": "^8.1.7"
             },
             "conflict": {
                 "pestphp/pest": "<5.0.0"
             },
             "require-dev": {
-                "livewire/livewire": "^4.3.5",
+                "livewire/livewire": "^4.4.7",
                 "nunomaduro/collision": "^8.9.5",
-                "orchestra/testbench": "^11.1",
+                "orchestra/testbench": "^11.3",
                 "pestphp/pest-dev-tools": "^5.0.0",
                 "pestphp/pest-plugin-laravel": "^5.0.1",
                 "pestphp/pest-plugin-type-coverage": "^5.0.2"
@@ -4959,7 +4959,7 @@
                 "unit"
             ],
             "support": {
-                "source": "https://github.com/pestphp/pest-plugin-browser/tree/v5.0.1"
+                "source": "https://github.com/pestphp/pest-plugin-browser/tree/v5.1.0"
             },
             "funding": [
                 {
@@ -4975,7 +4975,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2026-08-10T14:48:55+00:00"
+            "time": "2026-10-01T16:54:21+00:00"
         },
         {
             "name": "pestphp/pest-plugin-mutate",
