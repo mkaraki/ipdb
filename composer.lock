@@ -4895,16 +4895,16 @@
         },
         {
             "name": "pestphp/pest-plugin-browser",
-            "version": "v5.1.1",
+            "version": "v5.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pestphp/pest-plugin-browser.git",
-                "reference": "309ecc37108cad9c490f620652311e09773a9513"
+                "reference": "3425026b6563ca936cbdfabb9ac979355fab74c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pestphp/pest-plugin-browser/zipball/309ecc37108cad9c490f620652311e09773a9513",
-                "reference": "309ecc37108cad9c490f620652311e09773a9513",
+                "url": "https://api.github.com/repos/pestphp/pest-plugin-browser/zipball/3425026b6563ca936cbdfabb9ac979355fab74c1",
+                "reference": "3425026b6563ca936cbdfabb9ac979355fab74c1",
                 "shasum": ""
             },
             "require": {
@@ -4959,7 +4959,7 @@
                 "unit"
             ],
             "support": {
-                "source": "https://github.com/pestphp/pest-plugin-browser/tree/v5.1.1"
+                "source": "https://github.com/pestphp/pest-plugin-browser/tree/v5.1.2"
             },
             "funding": [
                 {
@@ -4975,7 +4975,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2026-10-01T18:08:27+00:00"
+            "time": "2026-10-02T10:52:14+00:00"
         },
         {
             "name": "pestphp/pest-plugin-mutate",
