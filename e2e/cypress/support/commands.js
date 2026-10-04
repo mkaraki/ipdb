@@ -9,13 +9,25 @@ const basic = (user, pass) => `Basic ${btoa(`${user}:${pass}`)}`;
 // Parses an HTML response body into a Document for cheap server-side queries.
 const parseHtml = (body) => new DOMParser().parseFromString(body, "text/html");
 
+// Migrate V2 _config.php style authentication to V3 db style authentication.
+// This will kick off testing user.
+Cypress.Commands.add("migrateV2V3User", (ip, extra = {}) =>
+    cy.request({
+        method: "POST",
+        url: "/migration/v2v3/users",
+        failOnStatusCode: true, // This migration tool won't throw error on already migrated.
+    })
+);
+
 // Attaches a Basic auth header to every request whose URL matches `matches`
 // (a glob, regex or predicate, as accepted by cy.intercept).
-Cypress.Commands.add("basicAuthOn", (matches, user, pass) =>
-  cy.intercept(matches, (req) => {
+Cypress.Commands.add("basicAuthOn", (matches, user, pass) => {
+  // Prepare users. This won't fail even already migrated. Just throw error message.
+  cy.migrateV2V3User();
+  return cy.intercept(matches, (req) => {
     req.headers["Authorization"] = basic(user, pass);
-  })
-);
+  });
+});
 
 // Logs in as USER_ATK_MANAGER for everything under /atk/admin.
 Cypress.Commands.add("asManager", () => {

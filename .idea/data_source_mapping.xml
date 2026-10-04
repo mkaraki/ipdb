@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourcePerFileMappings">
+    <file url="file://$PROJECT_DIR$/dbinit/202605160001.sql" value="1b2b454b-50ed-409e-bde9-2f06062b43cf" />
+    <file url="file://$PROJECT_DIR$/dbinit/202606200001.sql" value="1b2b454b-50ed-409e-bde9-2f06062b43cf" />
+    <file url="file://$PROJECT_DIR$/dbinit/202606200002.sql" value="1b2b454b-50ed-409e-bde9-2f06062b43cf" />
+    <file url="file://$PROJECT_DIR$/dbinit/202608070001.sql" value="1b2b454b-50ed-409e-bde9-2f06062b43cf" />
+    <file url="file://$PROJECT_DIR$/dbinit/202610040001.sql" value="1b2b454b-50ed-409e-bde9-2f06062b43cf" />
+  </component>
+</project>

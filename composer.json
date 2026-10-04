@@ -24,6 +24,11 @@
             "tests"
         ]
     },
+    "autoload": {
+        "classmap": [
+            "src"
+        ]
+    },
     "scripts": {
         "test": "pest"
     }

@@ -44,3 +44,5 @@ const APP_ENV = 'production';
         }
     </style>
 HTML;*/
+
+const PROVIDE_MIGRATION_ENDPOINT = true;

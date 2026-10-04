@@ -1,9 +1,13 @@
 <?php
 
+use Middleware\AdminAuthMiddleware;
+use Middleware\AtkBotAuthMiddleware;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
+use Repositories\AdminUserRepository;
+use Repositories\AtkReporterRepository;
 use Sentry\State\Hub;
 use Slim\Factory\AppFactory;
 use Slim\Routing\RouteCollectorProxy;
@@ -17,7 +21,6 @@ require __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../_config.php';
 
 require_once __DIR__ . '/../src/DbProxy.php';
-require_once __DIR__ . '/../src/AuthMiddlewares.php';
 require_once __DIR__ . '/../src/IpAccessUtils.php';
 require_once __DIR__ . '/../src/Atk/PostToAtk.php';
 require_once __DIR__ . '/../src/Atk/AtkFeed.php';
@@ -43,10 +46,9 @@ $logger->pushHandler(new \Sentry\Monolog\BreadcrumbHandler(
 
 $app = AppFactory::create();
 
-[
-    $atkBotAuthMiddleware,
-    $atkManagerAuthMiddleware,
-] = declare_auth_middlewares($app);
+$responseFactory = $app->getResponseFactory();
+$atkBotAuthMiddleware = new AtkBotAuthMiddleware($responseFactory);
+$atkManagerAuthMiddleware = new AdminAuthMiddleware($responseFactory);
 
 $twig = Twig::create(__DIR__ . '/../templates', ['cache' => false]);
 
@@ -187,6 +189,83 @@ $app->get('/', function (Request $request, Response $response, $args) {
         'remoteIp' => getAccessingIp($request) ?? 'Unknown',
     ]);
 });
+
+if (defined('PROVIDE_MIGRATION_ENDPOINT') && PROVIDE_MIGRATION_ENDPOINT) {
+    $app->get('/migration/v2v3/users', function (Request $request, Response $response, $args) {
+        $response->getBody()->write('<form method="post">IPdb v2 -> v3 users migration<button>Do it</button></form>');
+        return $response->withStatus(200);
+    });
+
+    $app->post('/migration/v2v3/users', function (Request $request, Response $response, $args) {
+        $db = db_init();
+
+        $body = $response->getBody();
+
+        if (defined('USER_ATK_MANAGER')) {
+            $body->write("# ATK Manager migrations\n");
+            $auRepo = new AdminUserRepository($db);
+
+            $userCount = $auRepo->count();
+            if ($userCount === null) {
+                $body->write("DB error\n\n");
+            }
+            else if ($userCount > 0) {
+                $body->write("Already migrated\n\n");
+            }
+            else {
+                foreach (USER_ATK_MANAGER as $u => $ph) {
+                    if (strlen($u) > 127 || strlen($ph) > 127) {
+                        $body->write("Unable to migrate user `$u`. Username must <= 127 chars.\n");
+                        continue;
+                    }
+                    $res = $auRepo->store([
+                        'username' => $u,
+                        'password_hash' => $ph,
+                    ]);
+                    if ($res === null) {
+                        $body->write("Unable to migrate user `$u`.\n");
+                    } else {
+                        $body->write("User `$u` migrated to id:$res.\n");
+                    }
+                }
+                $body->write("DONE\n\n");
+            }
+        }
+
+        if (defined('USER_ATK_REPORTER')) {
+            $body->write("# ATK Reporter migrations\n");
+            $repo = new AtkReporterRepository($db);
+
+            $userCount = $repo->count();
+            if ($userCount === null) {
+                $body->write("DB error\n\n");
+            }
+            else if ($userCount > 0) {
+                $body->write("Already migrated\n\n");
+            }
+            else {
+                foreach (USER_ATK_REPORTER as $u => $ph) {
+                    if (strlen($u) > 128 || strlen($ph) > 128) {
+                        $body->write("Unable to migrate user `$u`. Username must <= 128 chars.\n");
+                        continue;
+                    }
+                    $res = $repo->store([
+                        'username' => $u,
+                        'password_hash' => $ph,
+                    ]);
+                    if ($res === null) {
+                        $body->write("Unable to migrate user `$u`.\n");
+                    } else {
+                        $body->write("User `$u` migrated to id:$res.\n");
+                    }
+                }
+                $body->write("DONE\n\n");
+            }
+        }
+
+        return $response->withHeader('Content-type', 'text/plain')->withStatus(200);
+    });
+}
 
 $app->get('/info', function (Request $request, Response $response, $args) {
     $searchIp = $request->getQueryParams()['q'] ?? null;
