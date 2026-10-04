@@ -12,7 +12,8 @@
                 "github-actions"
             ],
             "groupName": "Actions/Docker/SigStore actions",
-            "automerge": true
+            "automerge": true,
+            "automergeType": "pr"
         },
         {
             "matchPackageNames": [
@@ -22,7 +23,8 @@
                 "github-actions"
             ],
             "versioning": "semver",
-            "automerge": true
+            "automerge": true,
+            "automergeType": "pr"
         },
         {
             "matchPackageNames": [
@@ -31,15 +33,31 @@
             "matchManagers": [
                 "composer"
             ],
-            "groupName": "Slim Framework"
+            "groupName": "Slim Framework",
+            "automerge": true,
+            "automergeType": "pr"
+        },
+        {
+            "matchPackageNames": [
+                "sentry/sentry"
+            ],
+            "matchManagers": [
+                "composer"
+            ],
+            "groupName": "Sentry",
+            "automerge": true,
+            "automergeType": "pr"
         },
         {
             "matchPackageNames": [
                 "pestphp/*",
                 "vimeo/psalm",
-                "cypress"
+                "cypress",
+                "playwright"
             ],
-            "groupName": "Testing frameworks"
+            "groupName": "Testing frameworks",
+            "automerge": true,
+            "automergeType": "pr"
         }
     ],
     "bumpVersions": [
