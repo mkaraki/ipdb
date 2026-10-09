@@ -6,7 +6,7 @@ COPY --exclude=vendor . /var/www/html/
 
 RUN composer install --ignore-platform-reqs
 
-FROM php:8.4-apache
+FROM php:8.5-apache
 
 RUN  --mount=type=bind,from=mlocati/php-extension-installer:latest,source=/usr/bin/install-php-extensions,target=/usr/local/bin/install-php-extensions \
     install-php-extensions mysqli apcu opcache excimer
