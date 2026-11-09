@@ -58,6 +58,24 @@
             "groupName": "Testing frameworks",
             "automerge": true,
             "automergeType": "pr"
+        },
+        {
+            "description": "Automerge psalm Docker image digest/pin updates (by Muse)",
+            "matchDatasources": [
+                "docker"
+            ],
+            "matchPackageNames": [
+                "ghcr.io/psalm/psalm-github-actions"
+            ],
+            "matchUpdateTypes": [
+                "digest",
+                "pin",
+                "pinDigest"
+            ],
+            "automerge": true,
+            "automergeType": "pr",
+            "platformAutomerge": true,
+            "ignoreTests": false
         }
     ],
     "bumpVersions": [
