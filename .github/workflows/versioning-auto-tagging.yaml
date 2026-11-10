@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   auto-tag:
-    uses: mkaraki/mkarakiapps-releasing-actions/.github/workflows/auto-tag.yaml@v0.2.8
+    uses: mkaraki/mkarakiapps-releasing-actions/.github/workflows/auto-tag.yaml@v0.2.9
     with:
       version-file: app_info.php
       version-file-format: php
