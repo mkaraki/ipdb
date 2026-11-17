@@ -4678,16 +4678,16 @@
         },
         {
             "name": "pestphp/pest",
-            "version": "v5.3.6",
+            "version": "v5.3.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pestphp/pest.git",
-                "reference": "848c740a44e5994e524f35ce9d4345bacf0dec74"
+                "reference": "ff1292102caee679da7294b239b434e93db5cf42"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pestphp/pest/zipball/848c740a44e5994e524f35ce9d4345bacf0dec74",
-                "reference": "848c740a44e5994e524f35ce9d4345bacf0dec74",
+                "url": "https://api.github.com/repos/pestphp/pest/zipball/ff1292102caee679da7294b239b434e93db5cf42",
+                "reference": "ff1292102caee679da7294b239b434e93db5cf42",
                 "shasum": ""
             },
             "require": {
@@ -4715,6 +4715,7 @@
                 "pestphp/pest-plugin-phpstan": "^5.3.1",
                 "pestphp/pest-plugin-rector": "^5.0.6",
                 "pestphp/pest-plugin-type-coverage": "^5.1.0",
+                "phpstan/phpstan": "^2.3.5 <2.3.6",
                 "psy/psysh": "^0.12.24"
             },
             "bin": [
@@ -4782,7 +4783,7 @@
             ],
             "support": {
                 "issues": "https://github.com/pestphp/pest/issues",
-                "source": "https://github.com/pestphp/pest/tree/v5.3.6"
+                "source": "https://github.com/pestphp/pest/tree/v5.3.7"
             },
             "funding": [
                 {
@@ -4794,8 +4795,8 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-11-14T21:14:48+00:00",
-            "published-time": "2026-11-14T21:21:17+00:00"
+            "time": "2026-11-16T17:50:56+00:00",
+            "published-time": "2026-11-16T17:51:27+00:00"
         },
         {
             "name": "pestphp/pest-plugin",
@@ -8565,16 +8566,16 @@
         },
         {
             "name": "vimeo/psalm",
-            "version": "7.8.0",
+            "version": "7.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vimeo/psalm.git",
-                "reference": "60e0a00e920b619377e44f7359b2b79c5463b585"
+                "reference": "6b439ac5947fccc105ec83faf60568d15e24d2a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vimeo/psalm/zipball/60e0a00e920b619377e44f7359b2b79c5463b585",
-                "reference": "60e0a00e920b619377e44f7359b2b79c5463b585",
+                "url": "https://api.github.com/repos/vimeo/psalm/zipball/6b439ac5947fccc105ec83faf60568d15e24d2a9",
+                "reference": "6b439ac5947fccc105ec83faf60568d15e24d2a9",
                 "shasum": ""
             },
             "require": {
@@ -8682,8 +8683,8 @@
                 "issues": "https://github.com/vimeo/psalm/issues",
                 "source": "https://github.com/vimeo/psalm"
             },
-            "time": "2026-11-16T16:11:35+00:00",
-            "published-time": "2026-11-16T16:29:59+00:00"
+            "time": "2026-11-16T23:00:17+00:00",
+            "published-time": "2026-11-17T00:44:45+00:00"
         },
         {
             "name": "webmozart/assert",
